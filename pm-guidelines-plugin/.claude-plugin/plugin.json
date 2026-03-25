@@ -23,16 +23,16 @@
     "reports"
   ],
   "skills": [
-    "../pm-report-writing",
-    "../pm-dashboard-design",
-    "../pm-session-discipline",
-    "../pm-bilingual-standards",
-    "../pm-estimation",
-    "../pm-consolidation"
+    "./pm-report-writing",
+    "./pm-dashboard-design",
+    "./pm-session-discipline",
+    "./pm-bilingual-standards",
+    "./pm-estimation",
+    "./pm-consolidation"
   ],
   "agents": [
-    "../agents/pm-report-reviewer",
-    "../agents/pm-bilingual-qa"
+    "./agents/pm-report-reviewer",
+    "./agents/pm-bilingual-qa"
   ],
-  "hooks": "../hooks/hooks.json"
+  "hooks": "./hooks/hooks.json"
 }
