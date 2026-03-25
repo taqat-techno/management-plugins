@@ -14,7 +14,7 @@
         "name": "TaqaTechno",
         "email": "info@taqatechno.com"
       },
-      "source": "./pm-guidelines-plugin",
+      "source": "./plugins/pm-guidelines-plugin",
       "category": "productivity",
       "homepage": "https://github.com/taqat-techno/management-plugins/tree/main/pm-guidelines-plugin"
     }
