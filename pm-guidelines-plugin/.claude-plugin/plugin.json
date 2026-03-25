@@ -6,33 +6,5 @@
     "name": "TaqaTechno",
     "email": "info@taqatechno.com",
     "url": "https://github.com/taqat-techno"
-  },
-  "homepage": "https://github.com/taqat-techno/management-plugins/tree/main/pm-guidelines-plugin",
-  "repository": "https://github.com/taqat-techno/management-plugins",
-  "license": "MIT",
-  "keywords": [
-    "pm",
-    "project-management",
-    "guidelines",
-    "quality",
-    "bilingual",
-    "security",
-    "hooks",
-    "enforcement",
-    "dashboard",
-    "reports"
-  ],
-  "skills": [
-    "./pm-report-writing",
-    "./pm-dashboard-design",
-    "./pm-session-discipline",
-    "./pm-bilingual-standards",
-    "./pm-estimation",
-    "./pm-consolidation"
-  ],
-  "agents": [
-    "./agents/pm-report-reviewer",
-    "./agents/pm-bilingual-qa"
-  ],
-  "hooks": "./hooks/hooks.json"
+  }
 }
