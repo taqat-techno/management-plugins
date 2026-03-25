@@ -270,6 +270,135 @@ For projects exceeding 10 subfolders, create `FOLDER_OBJECTIVE_MAP.html`:
 
 New team members can orient themselves immediately.
 
+## Dashboard Maintenance & Adoption (Rules 49-52)
+
+### Maintenance Burden Threshold (Rule 49)
+
+If a dashboard requires **> 30 manual inputs per week** for one person, it won't be used. Design rule: **if an API can provide it, never ask the PM to type it.**
+
+| Version | Manual Inputs | Outcome |
+|---------|--------------|---------|
+| v1 | ~113 | Never populated |
+| v2 | ~24 | Actively used |
+
+Always count manual inputs during design. Auto-fetch everything possible from DevOps APIs, databases, or localStorage history.
+
+### KRs Must Be Outcomes, Not Activities (Rule 50)
+
+Before finalizing OKRs, test each KR: **"Could someone else observe and verify this was achieved?"** If not, rewrite it.
+
+| Bad (Activity) | Good (Outcome) |
+|----------------|----------------|
+| "Weekly agendas with DevOps metrics pre-populated" | "Decision turnaround time < 3 days" |
+| "Hold weekly meetings" | "100% meeting compliance for 4 consecutive weeks" |
+| "Create sprint reports" | "Sprint carry-over rate < 15%" |
+
+### PM Scorecard for CEO Visibility (Rule 51)
+
+Team KPIs measure the team, not the PM. Add a dedicated **PM Scorecard** tab with metrics the CEO evaluates the PM on:
+
+- Decision turnaround time
+- Scope change control (% approved vs rejected)
+- Meeting compliance rate
+- Stakeholder satisfaction pulse
+- Risk escalation timeliness
+
+Without this, the PM is invisible in their own dashboard.
+
+### localStorage Snapshots for Trend Tracking (Rule 52)
+
+Save a weekly snapshot object into a history array on every "Save" click:
+
+```javascript
+function saveSnapshot() {
+    const history = JSON.parse(localStorage.getItem('okr-history') || '[]');
+    history.push({
+        date: new Date().toISOString().slice(0, 10),
+        data: getCurrentState()
+    });
+    // Cap at 13 weeks (~500KB)
+    if (history.length > 13) history.shift();
+    localStorage.setItem('okr-history', JSON.stringify(history));
+}
+```
+
+Use inline SVG sparklines (no Chart.js dependency) for week-over-week progress. Add Export/Import JSON for backup. Zero infrastructure needed.
+
+## OKR Dashboard v2 Lessons (Rules 67-71)
+
+### Tab vs Sidebar Navigation (Rule 67)
+
+**Under 10 views = tabs. 10+ views = sidebar.**
+
+| Views | Navigation | Reason |
+|-------|-----------|--------|
+| < 10 | Horizontal tabs | Fewer choices = faster cognitive load for executives |
+| 10+ | Sidebar | Persistent visibility of all options |
+
+v1 had 12 sidebar items; v2 consolidated to 7 tabs. Always consolidate before adding navigation complexity.
+
+### Auto-Fetch Coverage Determines Adoption (Rule 68)
+
+The practical threshold: **< 30 manual inputs/week** for PM dashboard adoption.
+
+Track your coverage ratio:
+```
+Auto-fetch ratio = auto-fetched data points / total data points
+Target: > 60% auto-fetch
+```
+
+v2 auto-fetches ~44 data points via WIQL, leaving only ~24 manual inputs.
+
+### Bilingual i18n via Data Attributes (Rule 69)
+
+Use `data-i18n` keys with a JS translation map — **never duplicate HTML for EN/AR**.
+
+```html
+<h3 data-i18n="team_pulse_title">Team Pulse</h3>
+```
+
+```javascript
+const translations = {
+    en: { team_pulse_title: "Team Pulse" },
+    ar: { team_pulse_title: "نبض الفريق" }
+};
+```
+
+Duplicating pages for languages doubles maintenance and guarantees drift.
+
+### Print CSS Must Show All Tabs (Rule 70)
+
+Dashboard print styles that hide inactive tabs produce blank pages:
+
+```css
+@media print {
+    .tab-content { display: block !important; }
+    .tab-content + .tab-content { page-break-before: always; }
+    .tab-content::before {
+        content: attr(data-tab-title);
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+}
+```
+
+Always test `Ctrl+P` after adding print styles.
+
+### Clickable Drill-Down Metric Cards (Rule 71)
+
+Every aggregate metric card should open a per-member or per-project breakdown modal on click:
+
+```javascript
+function showTeamDetailModal(teamId, state) {
+    // Show breakdown: who owns what within "To Do: 12"
+    const members = getTeamMembers(teamId);
+    const items = members.map(m => getItemsByState(m, state));
+    renderModal(items);
+}
+```
+
+Showing "To Do: 12" is useless without knowing who owns what. All aggregate numbers must drill down.
+
 ## Design Checklist
 
 Before delivering any dashboard:
@@ -284,3 +413,11 @@ Before delivering any dashboard:
 - [ ] Works offline (zero external dependencies)
 - [ ] Pipeline scripts are numbered (01, 02, 03...)
 - [ ] JSON intermediates decouple pipeline stages
+- [ ] Manual inputs < 30/week (auto-fetch everything possible)
+- [ ] KRs are outcomes, not activities ("Could someone verify this?")
+- [ ] PM Scorecard tab exists for CEO visibility
+- [ ] localStorage snapshots with Export/Import JSON
+- [ ] Tab navigation if < 10 views, sidebar if 10+
+- [ ] `data-i18n` attributes on all text (no duplicate HTML for languages)
+- [ ] Print CSS shows all tabs with page breaks
+- [ ] All metric cards have clickable drill-downs

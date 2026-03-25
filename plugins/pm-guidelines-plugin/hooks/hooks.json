@@ -40,6 +40,16 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py \"${CLAUDE_PLUGIN_ROOT}/hooks/powershell_safety_check.py\"",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -65,6 +75,11 @@
             "type": "command",
             "command": "py \"${CLAUDE_PLUGIN_ROOT}/hooks/html_render_reminder.py\"",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "py \"${CLAUDE_PLUGIN_ROOT}/hooks/version_drift_detector.py\"",
+            "timeout": 10
           }
         ]
       },
@@ -86,6 +101,11 @@
           {
             "type": "command",
             "command": "py \"${CLAUDE_PLUGIN_ROOT}/hooks/session_end_lessons.py\"",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "py \"${CLAUDE_PLUGIN_ROOT}/hooks/lesson_drift_detector.py\"",
             "timeout": 5
           }
         ]
