@@ -1,0 +1,22 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "management-plugins",
+  "description": "Project management and consulting best practices plugins for Claude Code - PM quality enforcement, bilingual documents, dashboards, and estimation",
+  "owner": {
+    "name": "TAQAT Techno",
+    "email": "info@taqatechno.com"
+  },
+  "plugins": [
+    {
+      "name": "pm-guidelines",
+      "description": "Cross-project PM best practices enforcement - status labels, bilingual parity, secret detection, source file protection, dashboard quality, and session discipline. 10 hooks, 6 skills, 2 agents.",
+      "author": {
+        "name": "TaqaTechno",
+        "email": "info@taqatechno.com"
+      },
+      "source": "./pm-guidelines-plugin",
+      "category": "productivity",
+      "homepage": "https://github.com/taqat-techno/management-plugins/tree/main/pm-guidelines-plugin"
+    }
+  ]
+}
