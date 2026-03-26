@@ -33,7 +33,7 @@ description: |
   </example>
 license: "MIT"
 metadata:
-  version: "1.0.0"
+  version: "1.2.0"
   priority: 55
   model: opus
   filePattern:
@@ -53,6 +53,8 @@ metadata:
       - "HUB output"
       - "source attribution"
       - "governance"
+      - "vendor names"
+      - "primary source"
     minScore: 6
 ---
 
@@ -212,3 +214,44 @@ Before delivering any consolidated output:
 - [ ] Recommendations presented neutrally (not auto-applied)
 - [ ] Conflict registry table with all conflicts summarized
 - [ ] HUB output is self-contained and independent of source files
+- [ ] Vendor names replaced with generic terms in current-state docs
+- [ ] Primary source identified before merging multi-file topics
+
+## Rule: Remove Vendor Names from Current-State Docs (Rule 118)
+
+In current-state architecture documents, replace specific vendor names with generic terms:
+
+| Instead of | Write |
+|-----------|-------|
+| "Camunda" | "external BPM tool" |
+| "Jira" | "project tracking system" |
+| "Oracle DB" | "relational database" |
+
+### Exception: Historical Documents
+
+Historical files keep vendor names because they document decisions made at a specific time:
+- **ADR (Architecture Decision Records)** — "We chose Camunda because..." is historically accurate
+- **Variance reports** — "Camunda license cost exceeded budget by..." is factual
+- **Meeting minutes** — Actual discussion references stay as-is
+
+Current-state docs describe *what the system does*, not *what products it uses*. When a vendor is replaced, only the current-state doc needs updating.
+
+## Rule: Identify the Primary Source Before Merging (Rule 115)
+
+When 3 or more files cover the same topic, one is always the most comprehensive. Find it first.
+
+### The Process
+
+1. **Scan all files** — count sections, depth, and completeness of each
+2. **Identify the skeleton** — the file with the broadest coverage becomes the base
+3. **Supplement from others** — only pull in content that fills genuine gaps
+4. **Never merge line-by-line** — line-by-line merging creates duplicates and contradictions
+
+### Example
+
+Given 3 files about the same meeting:
+- File A: 12 sections, covers all agenda items, action items, decisions (most comprehensive)
+- File B: 4 sections, deep notes on one topic
+- File C: 6 sections, partial overlap with A
+
+**Result:** Use File A as skeleton. Pull details from File B where File A has gaps. Discard overlapping content from C.

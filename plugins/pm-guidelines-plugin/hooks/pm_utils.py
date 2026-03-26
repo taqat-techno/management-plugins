@@ -3,7 +3,7 @@
 import os
 from pathlib import Path
 
-# Directories where PM deliverables live (hooks only fire on these)
+# Directories where PM deliverables live (hooks fire on these)
 PM_DIRECTORIES = [
     'researches',
     'tasks',
@@ -14,26 +14,56 @@ PM_DIRECTORIES = [
     'presentations',
 ]
 
+# Broader parent directory patterns (checked case-insensitively against full path)
+PM_PARENT_PATTERNS = [
+    'project management',
+    'khairgate',
+    'deliverable',
+    'weekly meeting',
+    'monthly report',
+    'outlook',
+]
+
+# Filename keywords that indicate a PM deliverable
+PM_FILENAME_KEYWORDS = [
+    'dashboard', 'report', 'agenda', 'analysis',
+    'proposal', 'presentation', 'okr', 'kpi',
+    'meeting', 'status', 'backlog', 'milestone',
+    'variance', 'risk_register', 'stakeholder',
+]
+
 # File extensions for PM deliverables
 PM_EXTENSIONS = {'.html', '.md', '.htm'}
 
 
 def is_pm_deliverable(file_path):
-    """Check if a file is in a PM deliverable directory."""
+    """Check if a file is in a PM deliverable directory or matches PM filename patterns."""
     if not file_path:
         return False
 
     normalized = file_path.replace('\\', '/').lower()
 
-    # Check extension
+    # Check extension first (gate)
     ext = os.path.splitext(normalized)[1]
     if ext not in PM_EXTENSIONS:
         return False
 
-    # Check if any PM directory is in the path
+    # Check if any PM directory is in the path (original logic)
     parts = normalized.split('/')
     for part in parts:
         if part in PM_DIRECTORIES:
+            return True
+
+    # Fallback 1: Check if a parent directory matches broader patterns
+    for pattern in PM_PARENT_PATTERNS:
+        if pattern in normalized:
+            return True
+
+    # Fallback 2: Check if filename contains PM deliverable keywords
+    filename = parts[-1] if parts else ''
+    filename_no_ext = os.path.splitext(filename)[0]
+    for keyword in PM_FILENAME_KEYWORDS:
+        if keyword in filename_no_ext:
             return True
 
     return False

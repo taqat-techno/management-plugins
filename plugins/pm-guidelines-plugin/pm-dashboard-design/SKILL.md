@@ -1,7 +1,7 @@
 ---
 name: pm-dashboard-design
 description: |
-  OKR/KPI dashboard design standards — auto-scoring, inverse metrics, source tabs, modular CSS, zero-dependency static HTML, numbered pipeline scripts, and JSON intermediates. Use when creating dashboards, portals, metrics pages, or data pipeline infrastructure.
+  OKR/KPI dashboard design standards — auto-scoring, inverse metrics, source tabs, data reconciliation, drill-down UX, modal accessibility, health auto-calculation, G/A/R toggles, and collapsible sections. Use when creating dashboards, KPI pages, or OKR scorecards. For DevOps API patterns see pm-devops-integration. For CSS/pipeline infrastructure see pm-html-infrastructure.
 
 
   <example>
@@ -33,8 +33,9 @@ description: |
   </example>
 license: "MIT"
 metadata:
-  version: "1.0.0"
+  version: "1.2.0"
   priority: 75
+  model: sonnet
   filePattern:
     - "**/*dashboard*"
     - "**/*report*.html"
@@ -50,10 +51,12 @@ metadata:
       - "KPI dashboard"
       - "OKR scorecard"
       - "metrics page"
-      - "portal page"
-      - "build scripts"
-      - "data pipeline"
       - "sprint dashboard"
+      - "health dashboard"
+      - "drill-down"
+      - "G/A/R toggle"
+      - "project health"
+      - "audit dashboard"
     minScore: 6
 ---
 
@@ -177,247 +180,161 @@ In dashboards for CEO/Board audiences, use full names:
 
 Abbreviations are internal shorthand that external stakeholders won't recognize.
 
-## DevOps Query Patterns (Rule 28-29)
+## Numbers Must Reconcile Across Views (Rule 121)
 
-### Use Real DevOps States (Rule 28)
+If Executive Summary shows "26 Bugs total", Team Pulse must also total 26. Mismatched totals destroy trust instantly.
 
-Always query actual states first:
-```
-GET /_apis/wit/workitemtypes/{type}/states
-```
+**Formula:** `Project total = Sum(all teams) + Unassigned`
 
-Real states: `To Do`, `In Progress`, `Resolved`, `Done`, `Closed`
+Always add an "Unassigned" card to catch work items with no owner. If totals don't match, debug before shipping.
 
-NEVER use made-up labels like "Active", "Carry-over", or "Backlog" unless they match the actual DevOps configuration.
+## Consistent Drill-Down Pattern (Rule 122)
 
-### Query by Assigned To (Rule 29)
-
-When Area Paths don't exist for team breakdown:
-```sql
-[System.AssignedTo] CONTAINS 'member name'
-```
-
-This works cross-project and is more flexible than area paths.
-
-### Discover Projects via API (Rule 31)
-
-Never hardcode project names. Always discover first:
-```
-GET /_apis/projects?api-version=7.0
-```
-
-Then let the user confirm which projects to include.
-
-## Modular CSS Architecture (Rule 44)
-
-Separate CSS into focused files from day one:
+Every clickable number must follow the same flow:
 
 ```
-static/css/
-├── variables.css        # Color tokens, spacing, typography
-├── base.css            # Reset, body, global styles
-├── layout.css          # Grid, containers, sections
-├── nav.css             # Navigation, tabs, sidebar
-├── components.css      # Cards, tables, badges, progress bars
-├── rtl.css             # Arabic/RTL overrides
-└── print.css           # Print-specific styles
+Card number → Breakdown table → Work Items popup (with DevOps links) → Back button
 ```
 
-This allows targeted changes without breaking unrelated pages.
+NEVER skip levels for some metric types while keeping them for others. If To Do has 3-level drill-down, Bugs must too. Inconsistency confuses users.
 
-## Pipeline Scripts (Rule 45-46)
+## Modal Accessibility (Rule 123)
 
-### Numbered Execution Order
+Modals with many items push the Close button off-screen. Always set:
 
-```
-scripts/
-├── 01_extract_devops.py       # Pull data from APIs
-├── 02_extract_timesheets.py   # Pull timesheet data
-├── 03_transform_sprint.py     # Clean and normalize
-├── 04_calculate_metrics.py    # Compute KPIs
-├── 05_generate_charts.py      # Build chart data
-├── 06_build_dashboard.py      # Assemble HTML
-└── run_all.sh                 # Execute 01→06 in sequence
-```
-
-### JSON Intermediates
-
-Each script reads from and writes to JSON files:
-```
-data/
-├── raw_workitems.json         # Output of 01
-├── raw_timesheets.json        # Output of 02
-├── normalized_sprint.json     # Output of 03
-├── metrics.json               # Output of 04
-├── charts.json                # Output of 05
-└── dashboard.html             # Output of 06
-```
-
-Large JSON intermediates (even 20MB) are worth the storage cost — they decouple pipeline stages so any downstream script can run independently.
-
-## Folder Objective Map (Rule 47)
-
-For projects exceeding 10 subfolders, create `FOLDER_OBJECTIVE_MAP.html`:
-
-```html
-<table>
-    <tr><th>Folder</th><th>Purpose</th><th>Key Files</th></tr>
-    <tr><td>scripts/</td><td>Data pipeline (01-06)</td><td>run_all.sh</td></tr>
-    <tr><td>data/</td><td>JSON intermediates</td><td>metrics.json</td></tr>
-    <tr><td>templates/</td><td>HTML templates</td><td>dashboard_base.html</td></tr>
-</table>
-```
-
-New team members can orient themselves immediately.
-
-## Dashboard Maintenance & Adoption (Rules 49-52)
-
-### Maintenance Burden Threshold (Rule 49)
-
-If a dashboard requires **> 30 manual inputs per week** for one person, it won't be used. Design rule: **if an API can provide it, never ask the PM to type it.**
-
-| Version | Manual Inputs | Outcome |
-|---------|--------------|---------|
-| v1 | ~113 | Never populated |
-| v2 | ~24 | Actively used |
-
-Always count manual inputs during design. Auto-fetch everything possible from DevOps APIs, databases, or localStorage history.
-
-### KRs Must Be Outcomes, Not Activities (Rule 50)
-
-Before finalizing OKRs, test each KR: **"Could someone else observe and verify this was achieved?"** If not, rewrite it.
-
-| Bad (Activity) | Good (Outcome) |
-|----------------|----------------|
-| "Weekly agendas with DevOps metrics pre-populated" | "Decision turnaround time < 3 days" |
-| "Hold weekly meetings" | "100% meeting compliance for 4 consecutive weeks" |
-| "Create sprint reports" | "Sprint carry-over rate < 15%" |
-
-### PM Scorecard for CEO Visibility (Rule 51)
-
-Team KPIs measure the team, not the PM. Add a dedicated **PM Scorecard** tab with metrics the CEO evaluates the PM on:
-
-- Decision turnaround time
-- Scope change control (% approved vs rejected)
-- Meeting compliance rate
-- Stakeholder satisfaction pulse
-- Risk escalation timeliness
-
-Without this, the PM is invisible in their own dashboard.
-
-### localStorage Snapshots for Trend Tracking (Rule 52)
-
-Save a weekly snapshot object into a history array on every "Save" click:
-
-```javascript
-function saveSnapshot() {
-    const history = JSON.parse(localStorage.getItem('okr-history') || '[]');
-    history.push({
-        date: new Date().toISOString().slice(0, 10),
-        data: getCurrentState()
-    });
-    // Cap at 13 weeks (~500KB)
-    if (history.length > 13) history.shift();
-    localStorage.setItem('okr-history', JSON.stringify(history));
+```css
+.modal-content {
+    max-height: 85vh;
+    overflow-y: auto;
 }
 ```
 
-Use inline SVG sparklines (no Chart.js dependency) for week-over-week progress. Add Export/Import JSON for backup. Zero infrastructure needed.
+The Close and Back buttons must ALWAYS be reachable without scrolling past content.
 
-## OKR Dashboard v2 Lessons (Rules 67-71)
+## Auto-Calculate Overall Health (Rule 111)
 
-### Tab vs Sidebar Navigation (Rule 67)
-
-**Under 10 views = tabs. 10+ views = sidebar.**
-
-| Views | Navigation | Reason |
-|-------|-----------|--------|
-| < 10 | Horizontal tabs | Fewer choices = faster cognitive load for executives |
-| 10+ | Sidebar | Persistent visibility of all options |
-
-v1 had 12 sidebar items; v2 consolidated to 7 tabs. Always consolidate before adding navigation complexity.
-
-### Auto-Fetch Coverage Determines Adoption (Rule 68)
-
-The practical threshold: **< 30 manual inputs/week** for PM dashboard adoption.
-
-Track your coverage ratio:
-```
-Auto-fetch ratio = auto-fetched data points / total data points
-Target: > 60% auto-fetch
-```
-
-v2 auto-fetches ~44 data points via WIQL, leaving only ~24 manual inputs.
-
-### Bilingual i18n via Data Attributes (Rule 69)
-
-Use `data-i18n` keys with a JS translation map — **never duplicate HTML for EN/AR**.
-
-```html
-<h3 data-i18n="team_pulse_title">Team Pulse</h3>
-```
+Never let users manually set "Overall" health when it can be computed from dimensions:
 
 ```javascript
-const translations = {
-    en: { team_pulse_title: "Team Pulse" },
-    ar: { team_pulse_title: "نبض الفريق" }
-};
+function calculateOverallHealth(schedule, quality, scope, blockerCount) {
+    // Start with worst dimension
+    const dimensions = [schedule, quality, scope]; // 'green', 'amber', 'red'
+    const worst = getWorst(dimensions);
+
+    let overall = worst;
+    // Blocker penalty
+    if (blockerCount > 3) overall = 'red';
+    else if (blockerCount > 0 && overall !== 'red') overall = downgrade(overall);
+
+    return overall;
+}
 ```
 
-Duplicating pages for languages doubles maintenance and guarantees drift.
+Remove the manual Overall toggle entirely. Manual values drift from reality.
 
-### Print CSS Must Show All Tabs (Rule 70)
+## localStorage Migration Between Versions (Rule 114)
 
-Dashboard print styles that hide inactive tabs produce blank pages:
+When a dashboard version changes its localStorage key (e.g., `okr-kpi-q2-v2` to `okr-kpi-q2-v3`), auto-migrate on load:
 
-```css
-@media print {
-    .tab-content { display: block !important; }
-    .tab-content + .tab-content { page-break-before: always; }
-    .tab-content::before {
-        content: attr(data-tab-title);
-        font-size: 1.5em;
-        font-weight: bold;
+```javascript
+function migrateData() {
+    const oldKey = 'okr-kpi-q2-2026-v2';
+    const newKey = 'okr-kpi-q2-2026-v3';
+    const oldData = localStorage.getItem(oldKey);
+    if (oldData && !localStorage.getItem(newKey)) {
+        const data = JSON.parse(oldData);
+        // Transform data shape if needed
+        localStorage.setItem(newKey, JSON.stringify(data));
+        localStorage.removeItem(oldKey);
     }
 }
 ```
 
-Always test `Ctrl+P` after adding print styles.
+Without migration, users lose all entered data on version upgrades.
 
-### Clickable Drill-Down Metric Cards (Rule 71)
+## Collapsible Sections for Board HTML (Rule 74)
 
-Every aggregate metric card should open a per-member or per-project breakdown modal on click:
+Board members navigate 15+ sections. Use collapsible containers:
+
+```html
+<details class="section" open>
+    <summary>Sprint Progress</summary>
+    <!-- section content -->
+</details>
+
+<details class="section">
+    <summary>Resolved Items (12)</summary>
+    <!-- collapsed by default for resolved/closed items -->
+</details>
+```
+
+**Rule:** Resolved/Closed sections should be collapsed by default (`<details>` without `open`). Focus attention on pending items.
+
+Add Expand All / Collapse All buttons for quick navigation.
+
+## Modal Popups Beat Inline Results (Rule 117)
+
+For audit output, validation results, or drill-down data:
 
 ```javascript
-function showTeamDetailModal(teamId, state) {
-    // Show breakdown: who owns what within "To Do: 12"
-    const members = getTeamMembers(teamId);
-    const items = members.map(m => getItemsByState(m, state));
-    renderModal(items);
+// BAD: inline div pushes content down, gets lost on scroll
+document.getElementById('results').innerHTML = output;
+
+// GOOD: modal overlay with backdrop, dismissible, no layout shift
+showModal({
+    title: 'Audit Results',
+    summary: { pass: 14, fail: 3, warn: 2 },
+    details: checkResults
+});
+```
+
+Include a summary bar (pass/fail counts) at the top of every modal.
+
+## G/A/R Toggles Need Deselect (Rule 125)
+
+Status toggle buttons must support clearing:
+
+```javascript
+function toggleGAR(el, value) {
+    if (el.classList.contains('selected')) {
+        el.classList.remove('selected'); // Deselect on second click
+        saveStatus(el, 'none');
+    } else {
+        // Clear siblings, select this one
+        el.parentNode.querySelectorAll('.gar-btn').forEach(b => b.classList.remove('selected'));
+        el.classList.add('selected');
+        saveStatus(el, value);
+    }
 }
 ```
 
-Showing "To Do: 12" is useless without knowing who owns what. All aggregate numbers must drill down.
+Without deselect, once you set a value you can never clear it.
 
 ## Design Checklist
 
 Before delivering any dashboard:
 
+**Architecture**
 - [ ] OKR and KPI sections are separate (not mixed)
+- [ ] Works offline (zero external dependencies)
+- [ ] See `pm-html-infrastructure` for CSS, pipeline, and print rules
+- [ ] See `pm-devops-integration` for WIQL, states, and Blocked field rules
+
+**Auto-Scoring & Data**
 - [ ] All scoring is automatic from editable "Current" fields
 - [ ] Inverse metrics use correct formula (lower-is-better)
+- [ ] Overall health auto-calculated from dimensions (no manual toggle)
+
+**Transparency**
 - [ ] "Data Source" tab exists with exact queries and verification links
 - [ ] Timestamps show fetch time, not live clock
 - [ ] Full project names used (no unexplained abbreviations)
-- [ ] CSS is modular (separate files, not one monolith)
-- [ ] Works offline (zero external dependencies)
-- [ ] Pipeline scripts are numbered (01, 02, 03...)
-- [ ] JSON intermediates decouple pipeline stages
-- [ ] Manual inputs < 30/week (auto-fetch everything possible)
-- [ ] KRs are outcomes, not activities ("Could someone verify this?")
-- [ ] PM Scorecard tab exists for CEO visibility
-- [ ] localStorage snapshots with Export/Import JSON
-- [ ] Tab navigation if < 10 views, sidebar if 10+
-- [ ] `data-i18n` attributes on all text (no duplicate HTML for languages)
-- [ ] Print CSS shows all tabs with page breaks
-- [ ] All metric cards have clickable drill-downs
+- [ ] Numbers reconcile across all views (total = sum of parts + unassigned)
+
+**UX & Accessibility**
+- [ ] Consistent drill-down pattern: Card -> Breakdown -> Items -> Back
+- [ ] Modals have `max-height: 85vh; overflow: auto`
+- [ ] G/A/R toggles support deselect (click again to clear)
+- [ ] Collapsible sections for board HTML; resolved items collapsed by default
+- [ ] Audit/validation results shown in modal popup, not inline div
+- [ ] localStorage migration logic handles version key changes

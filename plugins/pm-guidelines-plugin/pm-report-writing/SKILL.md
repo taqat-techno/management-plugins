@@ -1,7 +1,7 @@
 ---
 name: pm-report-writing
 description: |
-  PM report and document quality standards — enforces specificity, self-explanatory cells, consistent labels, and stakeholder email drafting with 3-version pattern. Use when generating status reports, proposals, email drafts, or any table-based PM deliverable.
+  PM report and document quality standards — enforces specificity, self-explanatory cells, consistent labels, title consistency, acronym expansion, two-audience awareness, and stakeholder email drafting with 3-version pattern. Use when generating status reports, proposals, email drafts, board presentations, or any table-based PM deliverable.
 
 
   <example>
@@ -33,8 +33,9 @@ description: |
   </example>
 license: "MIT"
 metadata:
-  version: "1.0.0"
+  version: "1.2.0"
   priority: 80
+  model: sonnet
   filePattern:
     - "**/researches/**"
     - "**/reports/**"
@@ -53,6 +54,10 @@ metadata:
       - "progress report"
       - "send email"
       - "board report"
+      - "CEO report"
+      - "board presentation"
+      - "monthly report"
+      - "performance report"
     minScore: 6
 ---
 
@@ -141,14 +146,95 @@ Attached: Q1 Progress Report
 - Next quarter timeline and milestones
 ```
 
+## Rule 6: Two-Audience Report Pattern (Rule 133 from memory)
+
+The same project data often serves two different audiences. Never mix them in one document:
+
+| Aspect | Internal Performance Report | CEO/Board Report |
+|--------|---------------------------|------------------|
+| **Audience** | Engineering Manager, Team Leads | CEO, Board, Operations Manager |
+| **Individual hours** | Yes — per-developer breakdown | No — project-level only |
+| **Bug details** | Full list with assignees | Count + trend only |
+| **Rankings** | Developer scorecard, velocity per person | Team-level KPIs |
+| **Tone** | Analytical, data-heavy | Executive summary, achievements + risks |
+| **Signature** | IT Project Manager | Matching current governance structure |
+
+When asked to "create a report," always clarify the audience first. If both audiences need it, create two separate documents from the same data source.
+
+## Rule 7: Title Consistency (Rules 119, 133)
+
+Use the exact same job title in every occurrence within a document:
+
+| Bad | Good |
+|-----|------|
+| Header: "IT Project Manager" / Footer: "PM" | Both: "IT Project Manager" |
+| Signature: "Project Manager" / Meta: "IT PM" | Both: "IT Project Manager" |
+
+Check these locations: page header, signature block, print summary, meta tags, author fields. Title mismatches erode credibility in board-facing reports.
+
+## Rule 8: Spell Out Acronyms for Board (Rule 132)
+
+CEO and Board members don't share internal jargon. Every acronym must have its full form nearby:
+
+| Bad | Good |
+|-----|------|
+| "OKR & KPI Dashboard" | "Objectives & Key Results (OKR) & Key Performance Indicators (KPI) Dashboard" |
+| "BMS Integration" | "Building Management System (BMS) Integration" |
+| "WIQL Query" | "Work Item Query Language (WIQL) Query" |
+
+The abbreviated form is for navigation (tabs, sidebar). The full form is for comprehension (headers, titles).
+
+## Rule 9: Categorize by Participants, Not Keywords (Rule 134)
+
+When assigning topics or email threads to project categories:
+
+```
+BAD:  "Terms and Conditions (English)" → Relief Center (keyword match on "Terms")
+GOOD: Check participants (Dr. Bahaa, Hacene, Syed) → BMS/KhairGate (correct project)
+```
+
+Always check the participant list before assigning. Keywords are ambiguous; people are not.
+
+## Rule 10: Embed Update Process in Deliverable (Rule 137)
+
+If a report has a recurring update workflow, document it inside the report itself:
+
+```html
+<div class="info-card">
+    <h4>How This Report Gets Updated</h4>
+    <ol>
+        <li>Export inbox_emails.csv and sent_emails.csv from Outlook</li>
+        <li>Run topic_summary.py to generate topic_summary.csv</li>
+        <li>Open this HTML and click "Update Data" on the Dashboard tab</li>
+        <li>Review new topics and assign to correct project categories</li>
+        <li>Save and distribute via Teams</li>
+    </ol>
+    <p><strong>Schedule:</strong> Every Thursday before weekly meeting</p>
+</div>
+```
+
+Anyone opening the report should understand how it gets updated without needing external documentation.
+
 ## Quality Checklist (Run Before Finalizing)
 
 Before completing any PM document, verify:
 
+**Content Quality**
 - [ ] Every cell is self-explanatory without the author present
 - [ ] Same state uses identical wording across all rows
 - [ ] No "Ongoing" / "TBD" / "In Progress" without specific next steps
 - [ ] Platform/tool/system names are explicit (not generic)
 - [ ] Numbers have context (not just "15" but "15 of 22 completed")
-- [ ] Abbreviations defined on first use
-- [ ] For emails: 3 versions provided, attachments listed with bullet points
+
+**Consistency & Audience**
+- [ ] Abbreviations defined on first use (especially for board audience)
+- [ ] Same job title used consistently throughout (header, signature, meta)
+- [ ] Two-audience split considered (internal detail vs board summary)
+- [ ] Topic categorization verified by participants, not keywords
+
+**Emails**
+- [ ] 3 versions provided (formal, concise, action-oriented)
+- [ ] Attachments listed with bullet points describing contents
+
+**Recurring Reports**
+- [ ] Update workflow embedded in the deliverable itself

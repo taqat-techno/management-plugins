@@ -1,7 +1,7 @@
 ---
 name: pm-bilingual-standards
 description: |
-  Bilingual EN/AR document standards — data-i18n from day one, RTL validation, language parity, Arabic toggle planning, and paired span architecture. Use when creating or editing documents that need both English and Arabic versions.
+  Bilingual EN/AR document standards — data-i18n from day one, RTL validation, language parity, Arabic toggle planning, paired span architecture, atomic i18n commits, and brand transliteration. Use when creating or editing documents that need both English and Arabic versions.
 
 
   <example>
@@ -33,8 +33,9 @@ description: |
   </example>
 license: "MIT"
 metadata:
-  version: "1.0.0"
+  version: "1.2.0"
   priority: 65
+  model: sonnet
   filePattern:
     - "**/*bilingual*"
     - "**/*ar_*"
@@ -206,13 +207,63 @@ After any change:
 </table>
 ```
 
+## Rule 120: Batch i18n — Attributes + Dictionary in One Commit
+
+Adding `data-i18n` attributes to HTML without updating the JS translation dictionary causes keys to display as raw strings (e.g., the user sees `page-title` instead of the translated text).
+
+**Two patterns exist — both require atomic updates:**
+
+### Pattern A: Inline Paired Spans (simple pages)
+Each text element has `lang-en` and `lang-ar` spans. Adding a new text element means adding BOTH spans.
+
+### Pattern B: JS Dictionary (complex dashboards, 200+ keys)
+A central JS object holds all translations:
+
+```javascript
+// i18n.js — translation dictionary
+var T = {
+    'page-title': { en: 'Project Status', ar: 'حالة المشروع' },
+    'last-updated': { en: 'Last Updated', ar: 'آخر تحديث' },
+    // ... 550+ entries
+};
+
+function toggleLang() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = T[key][currentLang];
+    });
+}
+```
+
+**Rule:** When using Pattern B, every commit that adds `data-i18n` attributes to HTML files MUST also add the corresponding entries to the dictionary. For Hub V2: 9 HTML files + i18n.js = one atomic commit.
+
+## Rule: Arabic Brand Names — Transliteration, Not Translation
+
+Brand names must be **transliterated** (phonetic Arabic rendering), never translated:
+
+| Brand | Transliteration (correct) | Translation (wrong) |
+|-------|--------------------------|---------------------|
+| Herbal Gardens | هربل جاردنز | العشبية |
+| KhairGate | خير جيت | بوابة الخير |
+| Pearl Pixels | بيرل بيكسلز | لآلئ البكسل |
+
+Brand identity must survive language switching. If you translate a brand name, it becomes unrecognizable to anyone who knows it in the original language.
+
 ## Bilingual Checklist
 
 Before delivering any bilingual document:
 
+**Structure**
 - [ ] Every text element has paired `lang-en` / `lang-ar` spans
 - [ ] All spans have `data-i18n` keys for identification
 - [ ] Language toggle button works in both directions
+
+**i18n Integrity**
+- [ ] `data-i18n` attributes AND JS dictionary updated in same commit
+- [ ] Brand names transliterated, not translated
+- [ ] No raw key names visible when toggling to Arabic
+
+**RTL & Visual**
 - [ ] RTL CSS file exists and is loaded
 - [ ] Both views checked visually (no orphaned text, no overflow)
 - [ ] Table columns render correctly in both directions

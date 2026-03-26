@@ -35,6 +35,7 @@ license: "MIT"
 metadata:
   version: "1.0.0"
   priority: 75
+  model: sonnet
   filePattern:
     - "**/standalone*"
     - "**/kickoff*"

@@ -39,6 +39,8 @@ tools: Read, Grep, Glob
 skills:
   - pm-report-writing
   - pm-dashboard-design
+  - pm-devops-integration
+  - pm-html-infrastructure
   - pm-bilingual-standards
 ---
 
@@ -68,6 +70,8 @@ You are a PM deliverable quality reviewer. Your job is to read completed documen
 | RQ-06 | Empty cells or `--` for completed items | Grep for empty `<td>` or `--` in status columns | Critical |
 | RQ-07 | Abbreviations without definition | Grep for uppercase 2-4 char words without nearby expansion | Info |
 | RQ-08 | Generic tool references | Grep for "the system", "the tool", "the platform" | Warning |
+| RQ-09 | Title inconsistency | Grep for "Project Manager" vs "IT Project Manager" vs "PM" as role title — flag if >1 variant found | Critical |
+| RQ-10 | Acronyms without expansion | Grep for uppercase 2-4 char terms (OKR, KPI, BMS) without parenthetical full form within 200 chars | Warning |
 
 ### B. Dashboard Quality (dashboards only)
 
@@ -79,6 +83,8 @@ You are a PM deliverable quality reviewer. Your job is to read completed documen
 | DQ-04 | Manual scoring (no auto-calculation) | Check for `<input>` with `onchange` or auto-calc JS | Info |
 | DQ-05 | Abbreviations without full names | Check for short uppercase terms without parenthetical expansion | Warning |
 | DQ-06 | Inverse metrics using standard formula | Check `data-direction` or comments for lower-is-better metrics | Warning |
+| DQ-07 | Numbers mismatch across views | Compare totals in summary/executive section vs detail/team sections — flag if they don't reconcile | Critical |
+| DQ-08 | Missing print CSS | Grep for `@media print` with `break-inside` — flag if dashboard has no print styles | Warning |
 
 ### C. Email Quality (emails only)
 
@@ -96,6 +102,7 @@ You are a PM deliverable quality reviewer. Your job is to read completed documen
 | BQ-02 | Empty translation spans | Grep for `lang-ar">\\s*<` (empty AR spans) | Critical |
 | BQ-03 | Missing data-i18n attributes | Check text elements without `data-i18n` | Warning |
 | BQ-04 | No RTL CSS file loaded | Grep for `rtl.css` or `[dir="rtl"]` in styles | Warning |
+| BQ-05 | i18n attributes without dictionary | Grep for `data-i18n` keys not found in `var T =` or translation object — raw keys visible on toggle | Warning |
 
 ## Scoring Rubric
 

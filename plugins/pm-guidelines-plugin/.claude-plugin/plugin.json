@@ -1,30 +1,10 @@
 {
   "name": "pm-guidelines",
-  "version": "1.1.0",
-  "description": "Cross-project PM best practices enforcement — 77 guidelines, 13 hooks, 8 skills, 3 agents. Covers status labels, bilingual parity, secret detection, source protection, dashboard quality, standalone updater, session discipline, and lesson sync.",
+  "version": "1.4.0",
+  "description": "Cross-project PM best practices enforcement — 137 guidelines, 8 hooks (7 quality checks in single dispatcher), 10 skills, 3 agents. Covers status labels, bilingual parity, dashboard quality, DevOps integration, HTML infrastructure, modal accessibility, print CSS, title consistency, session discipline, estimation, consolidation, and standalone updates.",
   "author": {
     "name": "TaqaTechno",
     "email": "info@taqatechno.com",
     "url": "https://github.com/taqat-techno"
-  },
-  "homepage": "https://github.com/taqat-techno/management-plugins/tree/main/pm-guidelines-plugin",
-  "repository": "https://github.com/taqat-techno/management-plugins",
-  "license": "MIT",
-  "keywords": ["pm", "project-management", "quality", "lessons-learned", "dashboard", "bilingual"],
-  "skills": [
-    "./pm-report-writing",
-    "./pm-dashboard-design",
-    "./pm-session-discipline",
-    "./pm-bilingual-standards",
-    "./pm-estimation",
-    "./pm-consolidation",
-    "./pm-standalone-updater",
-    "./lesson-sync"
-  ],
-  "agents": [
-    "./agents/pm-report-reviewer",
-    "./agents/pm-bilingual-qa",
-    "./agents/lesson-gap-analyzer"
-  ],
-  "hooks": "./hooks/hooks.json"
+  }
 }

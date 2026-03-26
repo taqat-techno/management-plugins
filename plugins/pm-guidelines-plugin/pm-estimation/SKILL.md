@@ -152,7 +152,7 @@ When a project uses AI-assisted development, traditional estimates don't apply. 
 
 **Key**: PM gets the lowest multiplier because project management decisions can't be automated. QA gets the highest because test generation is highly automatable.
 
-## Rule 32b: Derive What's Not Documented
+## Rule 40: Derive What's Not Documented
 
 If data exists but analysis doesn't:
 
@@ -162,7 +162,7 @@ If data exists but analysis doesn't:
 
 Example: If the backlog has 60 stories with SP values but no velocity history, calculate implied velocity from sprint boundaries.
 
-## Rule 33b: Show the Math, Not Just the Result
+## Rule 41: Show the Math, Not Just the Result
 
 | Bad | Good |
 |-----|------|
@@ -170,7 +170,7 @@ Example: If the backlog has 60 stories with SP values but no velocity history, c
 | "Project takes 4 months" | "4 calendar months at 15.4 effective PM with 6 team members" |
 | "AI reduces effort by 60%" | Table showing role-by-role multipliers with reasoning |
 
-## Rule 34b: Compare Before and After
+## Rule 42: Compare Before and After
 
 When two versions of a plan exist, ALWAYS present a variance table:
 
@@ -183,7 +183,7 @@ When two versions of a plan exist, ALWAYS present a variance table:
 
 Decision-makers need to see **what changed and by how much**.
 
-## Rule 35b: Define Jargon with Project Examples
+## Rule 43: Define Jargon with Project Examples
 
 When the user asks "what does X mean?", give a concrete example from THEIR project data:
 

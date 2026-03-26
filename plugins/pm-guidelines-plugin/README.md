@@ -1,26 +1,26 @@
 # PM Guidelines Plugin for Claude Code
 
-> **Cross-project PM best practices enforcement — automated quality checks for status reports, dashboards, bilingual documents, standalone versions, and stakeholder deliverables.**
+> **Cross-project PM best practices enforcement — automated quality checks for status reports, dashboards, bilingual documents, and stakeholder deliverables.**
 
-**v1.1.0** | 77 guidelines | 13 hooks | 8 skills | 3 agents
+**v1.4.0** | 137 guidelines | 8 hooks (7 quality checks in single dispatcher) | 10 skills | 3 agents
 
 ---
 
 ## What It Does
 
-Encodes 77 real-world PM lessons learned into a 3-layer enforcement system:
+Encodes 137 real-world PM lessons learned into a 3-layer enforcement system:
 
 | Layer | Purpose | How It Works |
 |-------|---------|-------------|
-| **Hooks** (13) | Real-time enforcement | Fire automatically on Write/Edit/Bash/Read/Stop events |
-| **Skills** (8) | Knowledge injection | Loaded into context during document generation |
+| **Hooks** (8) | Real-time enforcement | Fire automatically on Write/Edit/Bash/Read/Stop events. 7 quality checks consolidated into single dispatcher for performance. |
+| **Skills** (10) | Knowledge injection | Loaded into context during document generation |
 | **Agents** (3) | Batch quality review | Invoked after completing a deliverable for comprehensive audit |
 
 **Scoped to PM directories only** — hooks only fire on files in `researches/`, `reports/`, `deliverables/`, `dashboards/`, `proposals/`, `presentations/`, and `tasks/`. Zero noise for code files.
 
 ---
 
-## Hooks (13)
+## Hooks (8)
 
 ### Tier 1: Security (Block)
 
@@ -33,13 +33,9 @@ Encodes 77 real-world PM lessons learned into a 3-layer enforcement system:
 
 | Hook | Event | Behavior |
 |------|-------|----------|
-| `status_label_enforcer` | PostToolUse (Write/Edit) | Warns on "Ongoing", "independently" without specifics |
-| `bilingual_parity_check` | PostToolUse (Write/Edit) | Warns on EN/AR span count mismatch |
-| `dashboard_quality_check` | PostToolUse (Write/Edit) | Warns on missing source tab, live clocks |
+| `post_write_dispatcher` | PostToolUse (Write/Edit) | **Unified dispatcher** — runs 7 checks in one process: status labels, bilingual parity, dashboard quality, HTML render reminder, title consistency, modal accessibility, print CSS |
+| `version_drift_detector` | PostToolUse (Write/Edit) | Detects stale Document Control tables in versioned standalone folders |
 | `html_version_naming` | PreToolUse (Write) | Warns when overwriting deliverables without `_v2` suffix |
-| `html_render_reminder` | PostToolUse (Write/Edit) | Reminds to open HTML in browser after changes |
-| `version_drift_detector` | PostToolUse (Write/Edit) | Warns on stale Document Control tables in standalone/kickoff directories |
-| `powershell_safety_check` | PreToolUse (Bash) | Warns on em-dashes/curly quotes in PowerShell and missing .bat launchers |
 
 ### Tier 3: Session Lifecycle (Advisory)
 
@@ -48,22 +44,23 @@ Encodes 77 real-world PM lessons learned into a 3-layer enforcement system:
 | `git_pull_before_analysis` | PreToolUse (Read) | Warns if reading data files before running `git pull` |
 | `search_index_rebuild` | PostToolUse (Bash) | Reminds to rebuild search index after `git pull` |
 | `session_end_lessons` | Stop | Prompts for lesson capture at session end |
-| `lesson_drift_detector` | Stop | Warns if global_lessons.md has drifted from plugin copy |
 
 ---
 
-## Skills (8)
+## Skills (10)
 
 | Skill | Model | Purpose |
 |-------|-------|---------|
 | `pm-report-writing` | Sonnet | Report quality: specificity, consistent labels, email 3-version pattern |
-| `pm-dashboard-design` | Sonnet | Dashboard design: auto-scoring, source tabs, modular CSS, pipelines, maintenance burden, OKR v2 |
+| `pm-dashboard-design` | Sonnet | Dashboard core: OKR/KPI scoring, data transparency, drill-down UX, modal accessibility |
+| `pm-devops-integration` | Sonnet | Azure DevOps API: WIQL queries, real states, work item types, Blocked field |
+| `pm-html-infrastructure` | Sonnet | HTML infrastructure: modular CSS, pipeline scripts, print CSS, content escaping |
 | `pm-session-discipline` | Sonnet | Session workflow: memory vs tasks, lesson capture, pull-before-analyze |
 | `pm-bilingual-standards` | Sonnet | Bilingual EN/AR: data-i18n, RTL CSS, paired spans, language toggle |
 | `pm-estimation` | Opus | Effort estimation: SP scales, person-months, AI multipliers, variance tables |
 | `pm-consolidation` | Opus | Multi-source merge: conflict tracking, gap classification, source attribution |
-| `pm-standalone-updater` | Sonnet | Standalone version management: deep audit, versioned folders, Document Control, BA review loops, PowerShell safety, page type navigation |
-| `lesson-sync` | Sonnet | Lesson synchronization: category-to-component routing, gap analysis, drift detection |
+| `pm-standalone-updater` | Sonnet | Version folder management, Document Control, BA review loops, auto-updater |
+| `lesson-sync` | Sonnet | Lesson-to-component routing, sync procedure, gap analysis |
 
 ---
 
@@ -71,35 +68,11 @@ Encodes 77 real-world PM lessons learned into a 3-layer enforcement system:
 
 | Agent | Model | Skills Preloaded | Purpose |
 |-------|-------|-----------------|---------|
-| `pm-report-reviewer` | Opus | pm-report-writing, pm-dashboard-design, pm-bilingual-standards | Batch review of completed PM deliverables with quality score and violation list |
+| `pm-report-reviewer` | Opus | pm-report-writing, pm-dashboard-design, pm-devops-integration, pm-html-infrastructure, pm-bilingual-standards | Batch review of completed PM deliverables with quality score and violation list |
 | `pm-bilingual-qa` | Opus | pm-bilingual-standards | Deep structural validation of bilingual EN/AR HTML files |
-| `lesson-gap-analyzer` | Opus | lesson-sync | Coverage analysis of global_lessons.md against all plugin components |
+| `lesson-gap-analyzer` | Opus | lesson-sync | Analyzes coverage of global_lessons.md across all plugin components |
 
 All agents are **read-only** (tools: Read, Grep, Glob). They never modify files.
-
----
-
-## Lesson Sync System
-
-The plugin includes an automated system to keep lessons aligned with plugin components.
-
-### How It Works
-
-1. **Source of truth**: `global_lessons.md` in the project root
-2. **Plugin copy**: `global_lessons.md` inside the plugin directory
-3. **Drift detection**: The `lesson_drift_detector` hook checks at every session end
-4. **On-demand sync**: Say "sync lessons" or "lesson gap analysis" to trigger the `lesson-sync` skill
-5. **Gap analysis**: Launch the `lesson-gap-analyzer` agent for a comprehensive coverage report
-6. **Daily check**: Scheduled cron job compares both files weekdays at 9:23 AM
-
-### Category-to-Component Routing
-
-Every lesson category maps to specific plugin components via the routing table in the `lesson-sync` skill. When new lessons are added to `global_lessons.md`, the sync system:
-
-1. Parses the new lessons and their categories
-2. Matches categories to the routing table
-3. Routes each lesson to the correct skill, hook, or agent
-4. Flags unclassifiable lessons for manual review
 
 ---
 
@@ -142,7 +115,6 @@ pm-guidelines-plugin/
 │   └── plugin.json
 ├── .gitignore
 ├── README.md
-├── global_lessons.md
 ├── agents/
 │   ├── pm-report-reviewer.md
 │   ├── pm-bilingual-qa.md
@@ -150,19 +122,15 @@ pm-guidelines-plugin/
 ├── hooks/
 │   ├── hooks.json
 │   ├── pm_utils.py
+│   ├── post_write_dispatcher.py      ← consolidated (7 checks in 1 process)
 │   ├── pat_token_guard.py
 │   ├── source_file_protection.py
-│   ├── status_label_enforcer.py
-│   ├── bilingual_parity_check.py
-│   ├── dashboard_quality_check.py
 │   ├── html_version_naming.py
-│   ├── html_render_reminder.py
+│   ├── version_drift_detector.py
 │   ├── git_pull_before_analysis.py
 │   ├── search_index_rebuild.py
 │   ├── session_end_lessons.py
-│   ├── version_drift_detector.py
-│   ├── powershell_safety_check.py
-│   └── lesson_drift_detector.py
+│   └── health_check.py             ← plugin integrity validator
 ├── pm-report-writing/
 │   └── SKILL.md
 ├── pm-dashboard-design/
@@ -175,58 +143,86 @@ pm-guidelines-plugin/
 │   └── SKILL.md
 ├── pm-consolidation/
 │   └── SKILL.md
+├── pm-devops-integration/
+│   └── SKILL.md
+├── pm-html-infrastructure/
+│   └── SKILL.md
 ├── pm-standalone-updater/
 │   └── SKILL.md
-└── lesson-sync/
-    └── SKILL.md
+├── lesson-sync/
+│   └── SKILL.md
+└── tests/
+    ├── conftest.py
+    ├── test_pm_utils.py
+    ├── test_pat_token_guard.py
+    ├── test_post_write_dispatcher.py
+    └── fixtures/
 ```
+
+> **Note:** 7 legacy hook files (`status_label_enforcer.py`, `bilingual_parity_check.py`, etc.) remain in `hooks/` as reference but are not registered in hooks.json. Their logic is consolidated into `post_write_dispatcher.py`.
 
 ---
 
 ## Guidelines Covered
 
-All 77 guidelines are organized into domains:
+The 137 guidelines are organized into domains:
 
 | Domain | Guidelines | Components |
 |--------|-----------|------------|
-| Report Quality | 1-4 | pm-report-writing skill, status_label_enforcer hook |
-| Status Labels | 5-7 | pm-report-writing skill, status_label_enforcer hook |
-| Bilingual EN/AR | 8-10, 33 | pm-bilingual-standards skill, bilingual_parity_check hook |
+| Report Writing | 1-4 | pm-report-writing skill, post_write_dispatcher hook |
+| Status Labels | 5-7 | pm-report-writing skill, post_write_dispatcher hook |
+| Bilingual EN/AR | 8-10, 33 | pm-bilingual-standards skill, post_write_dispatcher hook |
 | Email Drafting | 11-13 | pm-report-writing skill |
-| HTML Deliverables | 14-15 | html_render_reminder hook, html_version_naming hook |
+| HTML Deliverables | 14-15 | html_version_naming hook, post_write_dispatcher hook |
 | Data Validation | 16-18 | pm-estimation skill |
-| OKR/KPI Dashboards | 19-21 | pm-dashboard-design skill, dashboard_quality_check hook |
+| OKR/KPI Dashboards | 19-21 | pm-dashboard-design skill, post_write_dispatcher hook |
 | Search Index | 22-23 | search_index_rebuild hook |
 | Project Estimation | 24-27 | pm-estimation skill |
-| DevOps Integration | 28-35 | pm-dashboard-design skill, pat_token_guard hook |
-| Session Workflow | 28b-31b, 36-38 | pm-session-discipline skill, git_pull_before_analysis hook, session_end_lessons hook |
-| Data Analysis | 32b-35b | pm-estimation skill |
-| Consolidation | 39-42, 48 | pm-consolidation skill, source_file_protection hook |
-| Portal Architecture | 43-47 | pm-dashboard-design skill |
-| Dashboard Maintenance | 49-52 | pm-dashboard-design skill, dashboard_quality_check hook |
-| Standalone Auto-Updater | 53-66 | pm-standalone-updater skill, version_drift_detector hook |
-| OKR Dashboard v2 | 67-71 | pm-dashboard-design skill, dashboard_quality_check hook |
-| Auto-Updater & UX | 72-77 | pm-standalone-updater skill, powershell_safety_check hook |
+| DevOps Integration | 28-35 | pm-devops-integration skill, pat_token_guard hook |
+| Session Workflow & Git | 36-39 | pm-session-discipline skill, git_pull_before_analysis hook |
+| Data Analysis | 40-43 | pm-estimation skill |
+| Memory & Lessons | 44-46 | pm-session-discipline skill, session_end_lessons hook |
+| Consolidation | 47-50 | pm-consolidation skill, source_file_protection hook |
+| Portal Architecture | 51-56 | pm-html-infrastructure skill |
+| Dashboard Maintenance | 57-60 | pm-dashboard-design skill |
+| Standalone Updater | 61-74 | pm-standalone-updater skill, version_drift_detector hook |
+| OKR Dashboard v2 | 75-83 | pm-dashboard-design skill |
+| Auto-Updater & UX | 84-89 | pm-standalone-updater skill |
+| Cross-File Consistency | 90-99 | pm-session-discipline skill |
+| Git & Deployment | 100-109 | pm-session-discipline skill |
+| Dashboard & KPI Design | 110-114 | pm-dashboard-design skill |
+| Document Consolidation | 115-116 | pm-consolidation skill |
+| Modal, Audit & i18n | 117-120 | pm-dashboard-design skill |
+| OKR Dashboard v3 | 121-133 | pm-dashboard-design skill |
+| Email Analysis | 134-137 | pm-report-writing skill |
 
 ---
 
-## Changelog
+## Health Check
 
-### v1.1.0 (March 25, 2026)
+Validate plugin integrity with a single command:
 
-- **Full 77/77 lesson coverage** (up from 48)
-- **New skill:** `pm-standalone-updater` — lessons 53-66, 72-77 (standalone versions, auto-updater, PowerShell safety, page type navigation)
-- **New skill:** `lesson-sync` — category-to-component routing table, sync procedure, gap analysis
-- **New agent:** `lesson-gap-analyzer` — read-only coverage analysis across all plugin components
-- **New hook:** `version_drift_detector` — warns on stale Document Control tables in standalone/kickoff directories
-- **New hook:** `powershell_safety_check` — warns on em-dashes/curly quotes in PowerShell commands and missing .bat launchers
-- **New hook:** `lesson_drift_detector` — warns at session end if global_lessons.md has drifted from plugin copy
-- **Extended:** `pm-dashboard-design` skill with lessons 49-52 (dashboard maintenance) and 67-71 (OKR v2)
-- **Daily cron job** for automated drift detection
+```bash
+py hooks/health_check.py
+```
 
-### v1.0.0
+Checks: hooks.json file references, agent skill references, orphaned files, lesson count vs plugin.json, skill directories, plugin metadata, model declarations.
 
-- Initial release: 48 guidelines, 10 hooks, 6 skills, 2 agents
+---
+
+## Testing
+
+73 tests covering the 3 highest-risk modules:
+
+```bash
+py -m pytest tests/ -v
+```
+
+| Test File | Tests | Coverage |
+|-----------|-------|----------|
+| `test_pm_utils.py` | 16 | Path matching, file type detection, safe reading |
+| `test_pat_token_guard.py` | 17 | Secret detection (GitHub, AWS, Azure, npm, Bearer) |
+| `test_post_write_dispatcher.py` | 40 | All 7 consolidated checks + graceful degradation |
 
 ---
 

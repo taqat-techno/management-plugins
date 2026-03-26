@@ -26,8 +26,9 @@ description: |
   </example>
 license: "MIT"
 metadata:
-  version: "1.0.0"
+  version: "1.2.0"
   priority: 50
+  model: sonnet
   filePattern:
     - "**/MEMORY.md"
     - "**/memory/**"
@@ -36,6 +37,7 @@ metadata:
   bashPattern:
     - "git pull"
     - "git diff"
+    - "git log"
   promptSignals:
     phrases:
       - "save lesson"
@@ -46,6 +48,8 @@ metadata:
       - "end of session"
       - "we're done"
       - "pull before"
+      - "fast-forward"
+      - "powershell regex"
     minScore: 6
 ---
 
@@ -129,3 +133,51 @@ Before reading ANY data/analysis file from a git repo:
 - [ ] `git diff --stat` reviewed to understand changes
 - [ ] Session log updated with pull details
 - [ ] Version files checked for internal consistency (v2 file shouldn't contain v1 data)
+- [ ] `git log OLD..NEW --oneline` run to see ALL intermediate commits (not just net diff)
+
+## Rule: Git Log OLD..NEW After Fast-Forward Pull
+
+After running `git pull`, always run `git log OLD_HEAD..HEAD --oneline` to see ALL intermediate commits. A fast-forward pull hides intermediate commits — `git diff` alone only shows the net result.
+
+### Why This Matters
+
+Fast-forward merges compress multiple commits into a single diff. If someone made 5 commits (add feature, fix bug, revert, re-add, fix typo), `git diff` shows only the final state. You miss the revert, the bug fix, and the reasoning in commit messages.
+
+### The Ritual
+
+```bash
+# Before pull — save current HEAD
+OLD_HEAD=$(git rev-parse HEAD)
+
+# Pull
+git pull
+
+# See ALL intermediate commits (not just net diff)
+git log $OLD_HEAD..HEAD --oneline
+
+# THEN do the diff for content changes
+git diff --stat $OLD_HEAD..HEAD
+```
+
+This was validated 14+ times in the Enhanced Standalone project. Without `git log OLD..NEW`, intermediate commits were repeatedly missed during fast-forward pulls.
+
+## Rule: Never Use PowerShell Regex for HTML Patching
+
+PowerShell's `-replace` operator and `[regex]::Replace()` silently mangle HTML attributes — reordering them, stripping quotes, or corrupting special characters.
+
+### Safe Alternatives
+
+| Task | WRONG | RIGHT |
+|------|-------|-------|
+| Replace text in HTML | `(Get-Content f.html) -replace $pattern, $replacement` | Use the Edit tool or `python -c "..."` |
+| Batch HTML edits | PowerShell pipeline with regex | Python script with `re.sub()` or BeautifulSoup |
+| Insert HTML block | String concatenation in PS1 | Edit tool with line-targeted insertion |
+
+### Why PowerShell Fails on HTML
+
+- Regex engine handles `"` and `'` differently in attribute values
+- `-replace` is case-insensitive by default, causing unintended matches
+- Pipeline encoding can corrupt UTF-8 characters in Arabic content
+- No dry-run mode — damage is immediate and silent
+
+This caused data corruption in multiple report build sessions.

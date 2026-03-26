@@ -35,6 +35,7 @@ license: "MIT"
 metadata:
   version: "1.0.0"
   priority: 80
+  model: sonnet
   filePattern:
     - "**/global_lessons*"
     - "**/lesson*"
@@ -73,16 +74,23 @@ This is the master routing table. Every lesson category maps to specific plugin 
 | OKR & KPI Dashboards | 19-21 | pm-dashboard-design | dashboard_quality_check | pm-report-reviewer |
 | Search Index Maintenance | 22-23 | — | search_index_rebuild | — |
 | Project Estimation & Story Points | 24-27 | pm-estimation | — | — |
-| DevOps API Integration | 28-35 | pm-dashboard-design | pat_token_guard | — |
-| Session Workflow & Git Hygiene | 28b-31b | pm-session-discipline | git_pull_before_analysis | — |
-| Data Analysis & Presentation | 32b-35b | pm-estimation | — | — |
-| Memory & Lessons Discipline | 36-38 | pm-session-discipline | session_end_lessons | — |
-| Consolidation & Multi-Source Architecture | 39-42, 48 | pm-consolidation | source_file_protection | — |
-| Portal & Pipeline Architecture | 43-47 | pm-dashboard-design | — | — |
-| Dashboard Maintenance & Adoption | 49-52 | pm-dashboard-design | dashboard_quality_check | pm-report-reviewer |
-| Enhanced Standalone Auto-Updater Rules | 53-66 | pm-standalone-updater | version_drift_detector | — |
-| OKR Dashboard v2 Lessons | 67-71 | pm-dashboard-design | dashboard_quality_check | pm-report-reviewer |
-| Auto-Updater & UX Redesign Lessons | 72-77 | pm-standalone-updater | powershell_safety_check | — |
+| DevOps API Integration | 28-35 | pm-devops-integration | pat_token_guard | — |
+| Session Workflow & Git Hygiene | 36-39 | pm-session-discipline | git_pull_before_analysis | — |
+| Data Analysis & Presentation | 40-43 | pm-estimation | — | — |
+| Memory & Lessons Discipline | 44-46 | pm-session-discipline | session_end_lessons | — |
+| Consolidation & Multi-Source Architecture | 47-50 | pm-consolidation | source_file_protection | — |
+| Portal & Pipeline Architecture | 51-56 | pm-html-infrastructure | — | — |
+| Dashboard Maintenance & Adoption | 57-60 | pm-dashboard-design | dashboard_quality_check | pm-report-reviewer |
+| Enhanced Standalone Auto-Updater Rules | 61-74 | pm-standalone-updater | version_drift_detector | — |
+| OKR Dashboard v2 Lessons | 75-83 | pm-dashboard-design | dashboard_quality_check | pm-report-reviewer |
+| Auto-Updater & UX Redesign Lessons | 84-89 | pm-standalone-updater | post_write_dispatcher | — |
+| Cross-File Consistency & Audit | 90-99 | pm-session-discipline | — | pm-report-reviewer |
+| Git, Branching & Deployment | 100-109 | pm-session-discipline | — | — |
+| Dashboard & KPI Design | 110-114 | pm-dashboard-design | post_write_dispatcher | pm-report-reviewer |
+| Document Consolidation | 115-116 | pm-consolidation | — | — |
+| Modal, Audit & i18n | 117-120 | pm-dashboard-design | post_write_dispatcher | pm-report-reviewer |
+| OKR & KPI Dashboard v3 | 121-133 | pm-dashboard-design | post_write_dispatcher | pm-report-reviewer |
+| Email Analysis & Weekly Reporting | 134-137 | pm-report-writing | — | pm-report-reviewer |
 
 ## Sync Procedure
 
@@ -93,15 +101,14 @@ Read `global_lessons.md` and extract:
 - Each `N. **Bold title** — description` = lesson
 - Build a list: `[{number, title, category, full_text}]`
 
-### Step 2: Compare with Plugin Copy
+### Step 2: Compare with Plugin Components
 
-Read `plugins/pm-guidelines-plugin/global_lessons.md` (the plugin's embedded copy).
+There is no plugin copy of `global_lessons.md` — the root file is the single source of truth. Compare its lessons against what is referenced in plugin components (skills, hooks, agents).
 
 Detect:
-- **New lessons**: present in source, absent in plugin copy
-- **Modified lessons**: same number but different text
-- **Removed lessons**: present in plugin copy, absent in source
-- **New categories**: `##` headings in source not in plugin copy
+- **New lessons**: present in source, not referenced in any component
+- **Modified lessons**: same number but description differs from component references
+- **New categories**: `##` headings in source not in routing table
 
 ### Step 3: Classify New Lessons
 
@@ -147,12 +154,12 @@ For each classified lesson:
 2. Add new check IDs to the appropriate check category table
 3. Update the scoring rubric if needed
 
-### Step 5: Sync Plugin Copy
+### Step 5: Update Plugin Metadata
 
 After routing all new lessons:
-1. Copy root `global_lessons.md` → `plugins/pm-guidelines-plugin/global_lessons.md`
-2. Update plugin.json version (bump patch: 1.1.0 → 1.1.1)
-3. Update README.md Guidelines Covered table
+1. Update plugin.json version (bump patch)
+2. Update README.md Guidelines Covered table
+3. Update routing table above if new categories were added
 
 ### Step 6: Report
 
@@ -194,6 +201,5 @@ If multiple lessons are added at once across different categories, process them 
 
 ## Sync Frequency
 
-- **Automatic:** The `lesson_drift_detector` hook checks at session end
 - **On-demand:** User says "sync lessons" or "lesson gap analysis"
-- **Scheduled:** Daily cron job compares both files
+- **Via agent:** Run `lesson-gap-analyzer` for a full coverage report
