@@ -33,7 +33,7 @@ description: |
   </example>
 license: "MIT"
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   priority: 75
   model: sonnet
   filePattern:
@@ -98,6 +98,48 @@ Every file in every version must have current:
 | Version | Must match folder version (e.g., "v12") |
 | Updated | Specific date: "25 Mar 2026" (not "March 2026") |
 | Data Source | Commit hash from Hub V2 (e.g., `abc1234`) |
+| Title/H1 tag | Must contain same v-number as folder (Rule 57-bis) |
+
+### Deep Body-Text Audit (Rule 57-bis)
+
+Surface updates are not enough. The auto-updater has historically bumped headers cleanly but left body text saying "as of v2.1" when the folder is v2.3 — a silent drift that the reader sees before the Document Control table. Every version bump must pass a deep audit across six elements.
+
+Six-element checklist:
+
+```
+[ ] Title tag (<title>) — contains the correct v-number
+[ ] H1 heading — contains the correct v-number
+[ ] Body text — no occurrences of the OLD v-number string ("v2.1",
+    "Version 2.1", "as of v2.1") outside historical-content zones
+[ ] Footer date — specific DD Mon YYYY, matches today
+[ ] Embedded commit hashes — match current HEAD of the source repo
+    (not a stale hash copied from a prior standalone folder)
+[ ] Document Control table — last row's version = header version;
+    last row's date = today; last row's Data Source = current commit hash
+```
+
+Run this audit every time a version is bumped, whether manually or via the auto-updater. If the auto-updater missed any of the six elements, fix by hand and file the gap against Rule 75 (automation threshold).
+
+### Historical-Content Protection
+
+Some body-text references to old versions are intentional — historical comparison sections, baseline callouts, ADR references, changelog entries. These are protected zones; the deep body-text audit must NOT flag them.
+
+Before flagging an old-version string, check whether it's inside one of these protected contexts:
+
+- A section whose heading matches `/Historical|Comparison|Version History|Baseline|Changelog|ADR|Decision Record|Previous Version/i`.
+- An HTML comment (`<!-- ... -->`) containing `historical`, `archived`, `baseline`, or `superseded`.
+- A `<blockquote>` or `<aside>` tagged with `data-historical="true"`.
+- A markdown blockquote (lines starting with `>`) inside a "Previous versions" or "History" section.
+
+Legitimate references inside these zones pass without flags. Anything outside these zones is drift.
+
+### Auto-Updater Escape Hatch
+
+Rule 75 says: if a check is missed 3+ times, build a tool. The corollary: if the tool keeps missing checks, stop trusting it.
+
+Escape criteria: if the auto-updater has run ≥3 times on this standalone and each run missed at least one body-text drift element, stop using it for this folder. Switch to manual version bumps using the deep-audit checklist above. Record the decision in the Document Control or CLAUDE.md so the next author doesn't re-enable the script.
+
+Build-better-tool criteria: if the pattern of missed checks is consistent (always the title tag, always the footer date), extend the auto-updater to cover those specific elements. One-off misses are human error; recurring misses are tool bugs.
 
 ### Footer Date (Rule 58)
 
@@ -255,9 +297,13 @@ If you create a summary page, merge it into the original rather than adding anot
 Before delivering any standalone update or auto-updater script:
 
 - [ ] ALL internal content audited (not just headers/footers)
+- [ ] Ran deep body-text audit (Rule 57-bis) — all 6 elements match folder version
+- [ ] Historical-content protection respected (no false positives on baseline/changelog zones)
 - [ ] New versioned folder created (never edited in place)
 - [ ] Document Control tables match folder version and date
+- [ ] Title tag and H1 contain the correct v-number (Rule 57-bis element 1 and 2)
 - [ ] Footer shows specific date (DD Mon YYYY)
+- [ ] Embedded commit hashes match current HEAD (not copied from prior folder)
 - [ ] Only PM-created artifacts in standalone (no Hub V2 copies)
 - [ ] Only latest report versions in kickoff package
 - [ ] Phase 0 vs full program clearly distinguished
@@ -267,3 +313,4 @@ Before delivering any standalone update or auto-updater script:
 - [ ] Buttons disabled when action unavailable
 - [ ] Navigation organized by page type (Action/Reference/Audit)
 - [ ] No duplicate pages covering same topic
+- [ ] If any files moved between standalone versions, pm-link-integrity validation ran

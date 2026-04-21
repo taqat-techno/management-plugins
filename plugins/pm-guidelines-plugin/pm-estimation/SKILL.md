@@ -40,7 +40,7 @@ description: |
   </example>
 license: "MIT"
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   priority: 60
   model: opus
   filePattern:
@@ -193,6 +193,38 @@ When the user asks "what does X mean?", give a concrete example from THEIR proje
 | Story point | "A relative measure of effort" | "In your backlog, SP 1 = simple field addition (like adding a phone field). SP 5 = cross-module integration (like the wallet-to-payment bridge)." |
 | Sprint velocity | "Story points completed per sprint" | "Your team completes ~18 SP per 2-week sprint based on the last 3 sprints." |
 
+## Data Readiness Gate (Rule DR-1)
+
+Before committing to any estimate that depends on live project data — sprint counts, open-task totals, user counts, cost figures — demand the Live-API probe output in-thread. Never build an estimate on assumed counts; verify against a live query.
+
+See `pm-devops-integration` for the probe recipe (Azure DevOps examples). Same principle applies to any live data source: cost APIs, licence dashboards, HR systems.
+
+### The Rule
+
+If a claim like "~40 open items" or "budget utilization around 62%" appears in an estimate, the source probe must have been run in the same thread and its output visible. If the probe failed (timeout, auth error, empty result) OR returned fewer than expected results, downgrade the estimate's confidence to LOW and state the assumption explicitly in the deliverable.
+
+### Anti-Patterns
+
+| Bad | Why | Good |
+|---|---|---|
+| "Based on roughly 40 open items..." (no probe shown) | Reader can't verify; estimate rests on a guess | "Based on 42 open items (probe timestamp 2026-04-21 15:30, WIQL in Data Source tab)..." |
+| Probe returned 0 items, estimate still gave "~20 open" | Estimate invented data the probe contradicted | "Probe returned 0 items (unexpected). Confidence: LOW. Recommend human verification before relying on this estimate." |
+| Estimate attached a probe from 3 months ago | Stale probe = stale estimate | Re-run the probe at estimation time; staleness tolerance is project-dependent (typically <7 days) |
+
+### Checklist
+
+```
+[ ] Every live-data claim has an in-thread probe output
+[ ] Probe timestamp recorded alongside the claim
+[ ] Probe failure downgrades confidence to LOW explicitly
+[ ] Stale probes (>7 days for active data) re-run before use
+[ ] Data Source tab of any deliverable lists the exact probe query and result
+```
+
+### Why Skill, Not Hook
+
+Network-call hooks are fragile: timeouts, PAT token leakage across subprocess boundaries, retries that double-count. Live probes belong in the authoring loop where Claude and the user can react to a failed probe, supply context, and decide how to annotate the estimate.
+
 ## Estimation Checklist
 
 Before delivering any estimation:
@@ -205,3 +237,4 @@ Before delivering any estimation:
 - [ ] Variance table shown when comparing plan versions
 - [ ] All math shown, not just results
 - [ ] Jargon defined with project-specific examples
+- [ ] Data Readiness Gate (Rule DR-1) passed for any live-data claims

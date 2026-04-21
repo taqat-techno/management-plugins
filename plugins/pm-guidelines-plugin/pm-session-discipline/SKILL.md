@@ -26,7 +26,7 @@ description: |
   </example>
 license: "MIT"
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
   priority: 50
   model: sonnet
   filePattern:
@@ -38,6 +38,8 @@ metadata:
     - "git pull"
     - "git diff"
     - "git log"
+    - "git status"
+    - "git push"
   promptSignals:
     phrases:
       - "save lesson"
@@ -47,9 +49,13 @@ metadata:
       - "update memory"
       - "end of session"
       - "we're done"
+      - "wrap up"
+      - "done for today"
       - "pull before"
       - "fast-forward"
       - "powershell regex"
+      - "edit the HTML"
+      - "regenerate HTML"
     minScore: 6
 ---
 
@@ -181,3 +187,56 @@ PowerShell's `-replace` operator and `[regex]::Replace()` silently mangle HTML a
 - No dry-run mode — damage is immediate and silent
 
 This caused data corruption in multiple report build sessions.
+
+## Rule 36-bis: Session-End Repo Discipline
+
+The Stop hook (`session_end_lessons.py`) reminds you to capture lessons. It does NOT check that your repos are clean and pushed — that's this rule's job.
+
+At the end of every session, before closing the window, walk through this checklist. Do not rely solely on the hook; it only prompts, it does not verify.
+
+End-of-session checklist:
+
+```
+[ ] `git status` in every active repo — no uncommitted changes left behind
+    unless intentional WIP (see below)
+[ ] `git log @{upstream}..HEAD --oneline` in every active repo — no
+    unpushed commits unless intentional
+[ ] Session log updated with files changed and key outcomes
+[ ] If any file moved this session: pm-link-integrity validation ran
+[ ] If any externally-sent deliverable: pm-context-boundary scrub ran
+[ ] Lessons captured — surprising failures AND confirmed-good choices both recorded
+```
+
+Intentional WIP state must be recorded in the session log with the reason. Example:
+
+> Wallet feature X is mid-implementation; resuming Tuesday. Not pushing until test coverage is added. Dirty state in `d:/KhairGate (HUB)/`: 3 modified files.
+
+Unrecorded WIP becomes next-session-Claude's confusion. Always annotate.
+
+## Rule HTML-MD-01: MD is the Source of Truth
+
+When both an `.md` and a sibling `.html` with the same stem exist in a PM deliverable folder, the Markdown file is canonical. The HTML is the generated artifact. The source-of-truth direction is MD -> HTML, never the reverse.
+
+**Forbidden:**
+
+- Editing the HTML directly to add content that isn't in the MD.
+- Updating a KPI row in the HTML and not the MD.
+- Regenerating HTML from MD without first reconciling drift.
+
+**Allowed:**
+
+- HTML-only concerns: CSS tweaks, JavaScript behaviour, embedded widgets, print-CSS, bilingual span pair wiring. These do not belong in the MD source.
+- Deleting the MD if it is demonstrably stale AND the HTML is now the intended source (document the switch in a commit message and in CLAUDE.md so a future author doesn't re-generate from the stale MD).
+- Editing the MD and re-running the export pipeline to regenerate the HTML.
+
+**Red flag:** if `stat` shows the HTML is newer than its MD sibling, someone edited the HTML directly. Options are:
+
+1. Update the MD to match the HTML changes (confirm with user first — the changes may be intentional).
+2. Revert the HTML changes.
+3. Retire the MD (if the workflow has genuinely moved to HTML-as-source).
+
+The `pm-md-html-parity-checker` agent (coming in Phase 2) diagnoses which option fits. Until that agent ships, diagnose manually with a visual diff.
+
+### Why This Rule Exists
+
+HTML pages lose content on every regeneration from MD. If a KPI row, an assumption, a risk, or a table column was added directly to HTML, the next regenerate silently drops it. The user discovers the loss only when they re-open the file — often days later, often in front of a stakeholder.

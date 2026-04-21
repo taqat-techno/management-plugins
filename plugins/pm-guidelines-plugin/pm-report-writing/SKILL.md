@@ -33,7 +33,7 @@ description: |
   </example>
 license: "MIT"
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
   priority: 80
   model: sonnet
   filePattern:
@@ -215,6 +215,28 @@ If a report has a recurring update workflow, document it inside the report itsel
 
 Anyone opening the report should understand how it gets updated without needing external documentation.
 
+## Project-Context Boundary (Rule 94-bis)
+
+Reports speak about exactly one project unless the title says Portfolio, Multi-Project, or Cross-Program. Cross-referencing another project mid-report confuses the reader — was that a claim about THIS project or THAT one? Prefix every cross-project reference with the project's name:
+
+| Bad | Good |
+|---|---|
+| "The team delivered Sprint 6 on time." (in a KhairGate Wallet report, accidentally referencing Relief Center's sprint) | "The Wallet team delivered Sprint 6 on time. (Relief Center's Sprint 6 closes 3 days later.)" |
+| "Open tasks: 14 → 8" (in a BMS report, number came from Wallet data) | — don't mix data sources at all; fix at the report level |
+| "Budget utilization: 62%" (unclear which project) | "BMS budget utilization: 62%" |
+
+Internal work-item IDs, team-internal names, and development-tool patterns belong in internal reports only. For anything crossing to the board, client, or another team, use the `pm-context-boundary` skill — it runs a structured scrub before external delivery.
+
+Cross-project reference checklist:
+
+```
+[ ] Report title reflects the correct project (not left over from a prior report)
+[ ] Every number traceable to this project's data source
+[ ] Cross-project mentions prefixed with the project's name
+[ ] Portfolio/multi-project reports marked as such in the title and H1
+[ ] Before external delivery, pm-context-boundary skill invoked
+```
+
 ## Quality Checklist (Run Before Finalizing)
 
 Before completing any PM document, verify:
@@ -231,6 +253,8 @@ Before completing any PM document, verify:
 - [ ] Same job title used consistently throughout (header, signature, meta)
 - [ ] Two-audience split considered (internal detail vs board summary)
 - [ ] Topic categorization verified by participants, not keywords
+- [ ] Project-context boundary respected (Rule 94-bis) — no stray cross-project references
+- [ ] For external delivery: pm-context-boundary skill invoked for scrub
 
 **Emails**
 - [ ] 3 versions provided (formal, concise, action-oriented)

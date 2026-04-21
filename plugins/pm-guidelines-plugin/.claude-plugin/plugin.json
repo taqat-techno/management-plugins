@@ -1,7 +1,7 @@
 {
   "name": "pm-guidelines",
-  "version": "1.4.0",
-  "description": "Cross-project PM best practices enforcement — 137 guidelines, 8 hooks (7 quality checks in single dispatcher), 10 skills, 3 agents. Covers status labels, bilingual parity, dashboard quality, DevOps integration, HTML infrastructure, modal accessibility, print CSS, title consistency, session discipline, estimation, consolidation, and standalone updates.",
+  "version": "1.7.0",
+  "description": "Cross-project PM best practices enforcement — 504 guidelines, 14 skills, 6 agents, 8 hooks (7 quality checks in single dispatcher). Covers status labels, bilingual parity, dashboard quality, cross-tab reconciliation, link integrity, context-boundary scrub, MD/HTML parity, data-readiness gate, DevOps integration, HTML infrastructure, modal accessibility, print CSS, title consistency, session discipline, estimation, consolidation, and standalone updates. v1.7.0 adds the pm-data-readiness skill (probe-before-publish workflow for live data claims) and the pm-link-auditor agent (post-hoc hyperlink integrity audit — companion to the pm-link-integrity skill).",
   "author": {
     "name": "TaqaTechno",
     "email": "info@taqatechno.com",

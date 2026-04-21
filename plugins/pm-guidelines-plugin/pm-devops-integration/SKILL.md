@@ -19,7 +19,7 @@ description: |
   </example>
 license: "MIT"
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   priority: 70
   model: sonnet
   filePattern:
@@ -27,6 +27,8 @@ metadata:
     - "**/*devops*"
     - "**/*sprint*"
     - "**/*wiql*"
+    - "**/roster.json"
+    - "**/.team-roster*"
   bashPattern: []
   promptSignals:
     phrases:
@@ -38,6 +40,11 @@ metadata:
       - "blocked items"
       - "DevOps states"
       - "assigned to query"
+      - "team roster"
+      - "roster file"
+      - "add team member"
+      - "data readiness"
+      - "live API probe"
     minScore: 6
 ---
 
@@ -112,6 +119,82 @@ The `Blocked` field is built into the work item form. Tags require discipline th
 
 PAT tokens should only be entered in browser modals and stored in localStorage. Never save them in code, memory files, or conversation. If a user shares one, remind them not to.
 
+## Canonical Roster File Pattern
+
+Team rosters drift when the same list of members is duplicated across dashboards, RACI tables, and WIQL `IN (...)` clauses. When Afthab joins QA-QC, the dashboard is updated but the WIQL query still lists only Mostafa — so Afthab's work items never show up. The fix is a single source of truth per project.
+
+Convention: one `roster.json` (or `.team-roster.yml`) in the project root:
+
+```json
+{
+  "team": "QA-QC",
+  "members": [
+    { "name": "Mostafa Ahmed", "email": "mostafa@taqat.qa", "role": "QC Lead" },
+    { "name": "Afthab P A", "email": "afthab@taqat.qa", "role": "QC Engineer", "dedicated_to": "KhairGate Wallet" }
+  ]
+}
+```
+
+Every dashboard, RACI table, and WIQL query consumes this file or imports from it. Hand-typing names into HTML is banned.
+
+Consuming in a dashboard:
+
+```javascript
+// Fetch once; render many
+async function loadRoster() {
+    const res = await fetch('./roster.json');
+    const roster = await res.json();
+    return roster;
+}
+
+// Team size comes from .length — honours Rule CT-04
+document.querySelector('.team-size').textContent =
+    roster.members.length + ' members';
+
+// WIQL IN-clause generated from roster
+const assignedToClause = roster.members
+    .map(m => `'${m.email}'`)
+    .join(', ');
+const wiql = `SELECT [System.Id] FROM WorkItems
+              WHERE [System.AssignedTo] IN (${assignedToClause})`;
+```
+
+Canonical roster checklist:
+
+```
+[ ] Dashboard reads roster from roster.json (not inline literals)
+[ ] RACI table cells reference names from roster.json
+[ ] WIQL IN-clauses are generated from roster.members[*].email
+[ ] Adding or removing a team member = one edit (roster.json), never N edits across files
+[ ] Roster file path documented in the dashboard's Data Source tab
+```
+
+## Live-API Probe Recipe — Data Readiness Gate (Rule DR-1)
+
+Before committing to any estimate, cost claim, user count, or sprint metric that depends on live DevOps data, demand the probe output in-thread. Never reason from assumed counts; verify against a live query.
+
+Probe templates:
+
+```bash
+# How many open items in a project?
+az boards query --wiql \
+    "SELECT [System.Id] FROM WorkItems WHERE [System.State] <> 'Closed'" \
+    --project "<project>" \
+    --query "length(@)"
+
+# Who is actually assigned in this area path?
+az boards query --wiql \
+    "SELECT DISTINCT [System.AssignedTo] FROM WorkItems
+     WHERE [System.AreaPath] UNDER '<path>'"
+
+# What states does this work item type actually have?
+az boards work-item type show --type Task --project "<project>"
+```
+
+Rule: if the probe fails (timeout, auth error, empty org) OR returns fewer than expected results, downgrade claim confidence to LOW and state the assumption explicitly in the deliverable. Never report "~40 open items" when the probe timed out — say "probe failed; estimate withheld".
+
+Why skill-only, not hook: network calls in PostToolUse hooks are fragile (timeouts, PAT leakage across subprocess boundaries, retries that double-count). Live probes belong in the authoring loop where Claude can react to a failed probe and the user can supply context.
+
 ## DevOps Integration Checklist
 
 Before delivering any DevOps-connected dashboard:
@@ -122,3 +205,5 @@ Before delivering any DevOps-connected dashboard:
 - [ ] Projects discovered via API, not hardcoded
 - [ ] PAT tokens stored in localStorage only, never in code
 - [ ] WIQL returns work item IDs — preserved for drill-down links (Rule 81)
+- [ ] Roster consumed from canonical roster.json (no inline name literals)
+- [ ] If making estimates or cost claims, ran the Live-API probe (Rule DR-1) and stated confidence

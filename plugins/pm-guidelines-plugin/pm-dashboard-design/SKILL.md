@@ -33,7 +33,7 @@ description: |
   </example>
 license: "MIT"
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
   priority: 75
   model: sonnet
   filePattern:
@@ -188,6 +188,8 @@ If Executive Summary shows "26 Bugs total", Team Pulse must also total 26. Misma
 
 Always add an "Unassigned" card to catch work items with no owner. If totals don't match, debug before shipping.
 
+**For multi-tab dashboards:** the `pm-cross-tab-reconciler` skill owns the single-source-of-truth data architecture that makes Rule 121 enforceable — every total rendered from one shared `data` object rather than hardcoded per tab. Activate that skill when adding or editing any tab in a multi-tab dashboard. The audit side (post-authoring semantic review) is handled by the `pm-cross-tab-reconciler` agent.
+
 ## Consistent Drill-Down Pattern (Rule 122)
 
 Every clickable number must follow the same flow:
@@ -251,6 +253,62 @@ function migrateData() {
 ```
 
 Without migration, users lose all entered data on version upgrades.
+
+### Rule 114-bis: Schema Versioning and Key Consolidation
+
+Rule 114 addresses migration when a key changes. Rule 114-bis prevents the underlying mistake: mixing multiple unrelated localStorage keys in one dashboard, or silently changing a key's shape without a version bump.
+
+**Versioned key pattern.** Every key name must carry a schema version suffix:
+
+```javascript
+const STORAGE_KEY = 'pm-dashboard-v2';  // bumped from v1 when schema changed
+const MIGRATION = {
+    fromV1(data) {
+        // new field added in v2; default to null for migrated records
+        return { ...data, newField: null };
+    }
+};
+
+function load() {
+    let raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+    // Attempt migration from prior schema
+    const v1 = localStorage.getItem('pm-dashboard-v1');
+    if (v1) {
+        const migrated = MIGRATION.fromV1(JSON.parse(v1));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+        localStorage.removeItem('pm-dashboard-v1');
+        return migrated;
+    }
+    return defaultState();
+}
+```
+
+**One versioned key per dashboard.** Do not scatter unrelated keys across one file (e.g., `kg-action-progress` alongside `kg-adr-state` alongside `kg-filters`). Consolidate into one object under one versioned key. When the schema needs new fields, bump the version and write a migration function — never silently change the shape.
+
+**Anti-patterns to avoid:**
+
+```javascript
+// BAD — three unrelated keys, none versioned
+localStorage.setItem('actionProgress', progress);
+localStorage.setItem('adrState', adr);
+localStorage.setItem('filters', filters);
+
+// BAD — key stayed 'pm-dashboard' but schema changed (users lose state)
+localStorage.setItem('pm-dashboard', { progress, adr, filters });  // was just { progress }
+
+// GOOD — one versioned key, one consolidated object, migration on version bump
+localStorage.setItem('pm-dashboard-v2', { progress, adr, filters });
+```
+
+Rule 114-bis checklist:
+
+```
+[ ] One versioned localStorage key per dashboard (no mixed unrelated keys)
+[ ] Schema version in the key name (pm-dashboard-v2, not pm-dashboard)
+[ ] Migration function (fromV1, fromV2, ...) for every prior schema version
+[ ] Migration runs once on load, preserves user data, removes the old key
+```
 
 ## Collapsible Sections for Board HTML (Rule 74)
 
