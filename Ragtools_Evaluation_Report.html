@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ragtools Evaluation Report | Apr 12–16, 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --primary: #0D47A1;
+    --primary-light: #1565C0;
+    --accent: #00BCD4;
+    --success: #4CAF50;
+    --warning: #FF9800;
+    --danger: #F44336;
+    --bg: #f5f7fa;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --text-muted: #6c757d;
+    --border: #e0e0e0;
+    --sidebar-width: 220px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', 'Noto Sans Arabic', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  [dir="rtl"] body { font-family: 'Noto Sans Arabic', 'Inter', sans-serif; }
+
+  /* === HEADER === */
+  .header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light), #1976D2);
+    color: white;
+    padding: 30px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+  .header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 4px; }
+  .header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+  .header .meta-row {
+    display: flex;
+    gap: 30px;
+    margin-top: 12px;
+    font-size: 0.85rem;
+    opacity: 0.85;
+  }
+  .header .lang-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+  }
+  .header .lang-toggle:hover { background: rgba(255,255,255,0.25); }
+  [dir="rtl"] .header .lang-toggle { right: auto; left: 20px; }
+
+  /* === LAYOUT === */
+  .layout { display: flex; min-height: calc(100vh - 120px); }
+
+  /* === SIDEBAR === */
+  .sidebar {
+    width: var(--sidebar-width);
+    background: white;
+    border-right: 1px solid var(--border);
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  [dir="rtl"] .sidebar { border-right: none; border-left: 1px solid var(--border); }
+  .sidebar .nav-section { padding: 8px 16px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 600; margin-top: 12px; }
+  .sidebar a {
+    display: block;
+    padding: 8px 20px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.85rem;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+  }
+  [dir="rtl"] .sidebar a { border-left: none; border-right: 3px solid transparent; }
+  .sidebar a:hover { background: #f0f4ff; border-left-color: var(--primary); }
+  [dir="rtl"] .sidebar a:hover { border-left-color: transparent; border-right-color: var(--primary); }
+  .sidebar a.active { background: #e3f2fd; border-left-color: var(--primary); font-weight: 600; }
+  [dir="rtl"] .sidebar a.active { border-left-color: transparent; border-right-color: var(--primary); }
+
+  /* === MAIN === */
+  .main { flex: 1; padding: 30px 40px; max-width: 1000px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* === CARDS === */
+  h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid #e3f2fd; padding-bottom: 10px; }
+  h3 { font-size: 1.1rem; font-weight: 600; margin: 20px 0 12px; color: #333; }
+
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    text-align: center;
+    border-top: 3px solid var(--primary);
+  }
+  .kpi-card.success { border-top-color: var(--success); }
+  .kpi-card.warning { border-top-color: var(--warning); }
+  .kpi-card.danger { border-top-color: var(--danger); }
+  .kpi-card .value { font-size: 2rem; font-weight: 700; color: var(--primary); }
+  .kpi-card.success .value { color: var(--success); }
+  .kpi-card.warning .value { color: var(--warning); }
+  .kpi-card.danger .value { color: var(--danger); }
+  .kpi-card .label { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  /* === TABLES === */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 0.88rem;
+  }
+  th {
+    background: #f0f4ff;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--border);
+  }
+  [dir="rtl"] th { text-align: right; }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
+  }
+  tr:hover { background: #fafbfd; }
+
+  /* === STATUS BADGES === */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-up { background: #e8f5e9; color: #2e7d32; }
+  .badge-down { background: #ffebee; color: #c62828; }
+  .badge-warn { background: #fff3e0; color: #e65100; }
+  .badge-info { background: #e3f2fd; color: #1565C0; }
+  .badge-neutral { background: #f5f5f5; color: #616161; }
+
+  /* === TIMELINE === */
+  .timeline { position: relative; padding-left: 30px; }
+  [dir="rtl"] .timeline { padding-left: 0; padding-right: 30px; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e3f2fd;
+  }
+  [dir="rtl"] .timeline::before { left: auto; right: 10px; }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 24px;
+    width: 12px;
+    height: 12px;
+    background: var(--primary);
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--primary);
+  }
+  [dir="rtl"] .timeline-item::before { left: auto; right: -24px; }
+  .timeline-item .day { font-size: 0.75rem; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .timeline-item h3 { margin: 0 0 10px; font-size: 1.05rem; }
+  .timeline-item ul { padding-left: 18px; font-size: 0.88rem; }
+  [dir="rtl"] .timeline-item ul { padding-left: 0; padding-right: 18px; }
+  .timeline-item li { margin-bottom: 6px; }
+
+  /* === LESSON CARDS === */
+  .lesson-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-left: 4px solid var(--primary);
+  }
+  [dir="rtl"] .lesson-card { border-left: none; border-right: 4px solid var(--primary); }
+  .lesson-card.high { border-left-color: var(--danger); }
+  [dir="rtl"] .lesson-card.high { border-right-color: var(--danger); }
+  .lesson-card .lesson-num { font-size: 0.75rem; font-weight: 700; color: var(--primary); }
+  .lesson-card .lesson-title { font-weight: 600; margin: 4px 0 8px; }
+  .lesson-card .lesson-detail { font-size: 0.88rem; color: #555; }
+
+  /* === ISSUE CARDS === */
+  .issue-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .issue-card.critical { border-left: 4px solid var(--danger); }
+  [dir="rtl"] .issue-card.critical { border-left: none; border-right: 4px solid var(--danger); }
+  .issue-card.moderate { border-left: 4px solid var(--warning); }
+  [dir="rtl"] .issue-card.moderate { border-left: none; border-right: 4px solid var(--warning); }
+  .issue-card .issue-title { font-weight: 600; margin-bottom: 8px; }
+  .issue-card .issue-detail { font-size: 0.88rem; color: #555; line-height: 1.7; }
+  .issue-card .issue-detail strong { color: var(--text); }
+
+  /* === RECOMMENDATION LIST === */
+  .rec-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .rec-card .rec-num {
+    min-width: 32px;
+    height: 32px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .rec-card .rec-body { flex: 1; }
+  .rec-card .rec-title { font-weight: 600; margin-bottom: 4px; }
+  .rec-card .rec-detail { font-size: 0.88rem; color: #555; }
+  .rec-card .rec-priority { font-size: 0.75rem; margin-top: 6px; }
+
+  /* === FOOTER === */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    background: white;
+  }
+
+  /* === LANG SPANS === */
+  .lang-en, .lang-ar { display: inline; }
+  [dir="rtl"] .lang-en { display: none; }
+  [dir="ltr"] .lang-ar { display: none; }
+
+  /* === PRINT === */
+  @media print {
+    .sidebar, .lang-toggle { display: none !important; }
+    .main { max-width: 100%; padding: 20px; }
+    .section { display: block !important; page-break-inside: avoid; }
+    .layout { display: block; }
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { padding: 16px; }
+    .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+    .header { padding: 20px; }
+    .header h1 { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="header">
+  <button class="lang-toggle" onclick="toggleLang()">
+    <span class="lang-en">AR</span><span class="lang-ar">EN</span>
+  </button>
+  <h1>
+    <span class="lang-en">Ragtools Evaluation Report</span>
+    <span class="lang-ar">&#1578;&#1602;&#1585;&#1610;&#1585; &#1578;&#1602;&#1610;&#1610;&#1605; Ragtools</span>
+  </h1>
+  <div class="subtitle">
+    <span class="lang-en">Local AI Knowledge Base System Assessment</span>
+    <span class="lang-ar">&#1578;&#1602;&#1610;&#1610;&#1605; &#1606;&#1592;&#1575;&#1605; &#1602;&#1575;&#1593;&#1583;&#1577; &#1575;&#1604;&#1605;&#1593;&#1585;&#1601;&#1577; &#1575;&#1604;&#1605;&#1581;&#1604;&#1610;</span>
+  </div>
+  <div class="meta-row">
+    <span><span class="lang-en">Period:</span><span class="lang-ar">&#1575;&#1604;&#1601;&#1578;&#1585;&#1577;:</span> Apr 12 – 16, 2026</span>
+    <span><span class="lang-en">Author:</span><span class="lang-ar">&#1575;&#1604;&#1605;&#1572;&#1604;&#1601;:</span> Mahmoud Elshahed</span>
+    <span><span class="lang-en">Version:</span><span class="lang-ar">&#1575;&#1604;&#1573;&#1589;&#1583;&#1575;&#1585;:</span> v1.0</span>
+    <span><span class="lang-en">Generated:</span><span class="lang-ar">&#1578;&#1605; &#1575;&#1604;&#1573;&#1606;&#1588;&#1575;&#1569;:</span> 16 Apr 2026</span>
+  </div>
+</div>
+
+<!-- ===== LAYOUT ===== -->
+<div class="layout">
+
+<!-- ===== SIDEBAR ===== -->
+<nav class="sidebar">
+  <div class="nav-section">
+    <span class="lang-en">Overview</span><span class="lang-ar">&#1606;&#1592;&#1585;&#1577; &#1593;&#1575;&#1605;&#1577;</span>
+  </div>
+  <a href="#" onclick="showSection('exec')" class="active" data-section="exec">
+    <span class="lang-en">Executive Summary</span><span class="lang-ar">&#1575;&#1604;&#1605;&#1604;&#1582;&#1589; &#1575;&#1604;&#1578;&#1606;&#1601;&#1610;&#1584;&#1610;</span>
+  </a>
+  <a href="#" onclick="showSection('timeline')" data-section="timeline">
+    <span class="lang-en">Timeline</span><span class="lang-ar">&#1575;&#1604;&#1580;&#1583;&#1608;&#1604; &#1575;&#1604;&#1586;&#1605;&#1606;&#1610;</span>
+  </a>
+
+  <div class="nav-section">
+    <span class="lang-en">Analysis</span><span class="lang-ar">&#1575;&#1604;&#1578;&#1581;&#1604;&#1610;&#1604;</span>
+  </div>
+  <a href="#" onclick="showSection('coverage')" data-section="coverage">
+    <span class="lang-en">Coverage Audit</span><span class="lang-ar">&#1578;&#1583;&#1602;&#1610;&#1602; &#1575;&#1604;&#1578;&#1594;&#1591;&#1610;&#1577;</span>
+  </a>
+  <a href="#" onclick="showSection('lessons')" data-section="lessons">
+    <span class="lang-en">Lessons Learned</span><span class="lang-ar">&#1575;&#1604;&#1583;&#1585;&#1608;&#1587; &#1575;&#1604;&#1605;&#1587;&#1578;&#1601;&#1575;&#1583;&#1577;</span>
+  </a>
+  <a href="#" onclick="showSection('ragfirst')" data-section="ragfirst">
+    <span class="lang-en">RAG-FIRST Rule</span><span class="lang-ar">&#1602;&#1575;&#1593;&#1583;&#1577; RAG-FIRST</span>
+  </a>
+
+  <div class="nav-section">
+    <span class="lang-en">Health</span><span class="lang-ar">&#1575;&#1604;&#1589;&#1581;&#1577;</span>
+  </div>
+  <a href="#" onclick="showSection('health')" data-section="health">
+    <span class="lang-en">Current Health</span><span class="lang-ar">&#1575;&#1604;&#1581;&#1575;&#1604;&#1577; &#1575;&#1604;&#1581;&#1575;&#1604;&#1610;&#1577;</span>
+  </a>
+  <a href="#" onclick="showSection('recs')" data-section="recs">
+    <span class="lang-en">Recommendations</span><span class="lang-ar">&#1575;&#1604;&#1578;&#1608;&#1589;&#1610;&#1575;&#1578;</span>
+  </a>
+</nav>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main">
+
+<!-- ==== SECTION 1: EXECUTIVE SUMMARY ==== -->
+<div id="sec-exec" class="section active">
+  <h2>
+    <span class="lang-en">Executive Summary</span>
+    <span class="lang-ar">&#1575;&#1604;&#1605;&#1604;&#1582;&#1589; &#1575;&#1604;&#1578;&#1606;&#1601;&#1610;&#1584;&#1610;</span>
+  </h2>
+
+  <div class="kpi-strip">
+    <div class="kpi-card">
+      <div class="value">43</div>
+      <div class="label"><span class="lang-en">Indexed Projects</span><span class="lang-ar">&#1605;&#1588;&#1575;&#1585;&#1610;&#1593; &#1605;&#1601;&#1607;&#1585;&#1587;&#1577;</span></div>
+    </div>
+    <div class="kpi-card success">
+      <div class="value">28,741</div>
+      <div class="label"><span class="lang-en">Total Chunks</span><span class="lang-ar">&#1573;&#1580;&#1605;&#1575;&#1604;&#1610; &#1575;&#1604;&#1571;&#1580;&#1586;&#1575;&#1569;</span></div>
+    </div>
+    <div class="kpi-card warning">
+      <div class="value">173 MB</div>
+      <div class="label"><span class="lang-en">Database Size</span><span class="lang-ar">&#1581;&#1580;&#1605; &#1602;&#1575;&#1593;&#1583;&#1577; &#1575;&#1604;&#1576;&#1610;&#1575;&#1606;&#1575;&#1578;</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="value">v0.4.0</div>
+      <div class="label"><span class="lang-en">Plugin Version</span><span class="lang-ar">&#1573;&#1589;&#1583;&#1575;&#1585; &#1575;&#1604;&#1573;&#1590;&#1575;&#1601;&#1577;</span></div>
+    </div>
+    <div class="kpi-card danger">
+      <div class="value">DOWN</div>
+      <div class="label"><span class="lang-en">HTTP Service</span><span class="lang-ar">&#1582;&#1583;&#1605;&#1577; HTTP</span></div>
+    </div>
+    <div class="kpi-card success">
+      <div class="value">UP</div>
+      <div class="label"><span class="lang-en">MCP Direct Mode</span><span class="lang-ar">&#1608;&#1590;&#1593; MCP &#1575;&#1604;&#1605;&#1576;&#1575;&#1588;&#1585;</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="value">6</div>
+      <div class="label"><span class="lang-en">Lessons Codified</span><span class="lang-ar">&#1583;&#1585;&#1608;&#1587; &#1605;&#1608;&#1579;&#1602;&#1577;</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="value">5</div>
+      <div class="label"><span class="lang-en">Days Since Install</span><span class="lang-ar">&#1571;&#1610;&#1575;&#1605; &#1605;&#1606;&#1584; &#1575;&#1604;&#1578;&#1579;&#1576;&#1610;&#1578;</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="lang-en">System Overview</span><span class="lang-ar">&#1606;&#1592;&#1585;&#1577; &#1593;&#1575;&#1605;&#1577; &#1593;&#1604;&#1609; &#1575;&#1604;&#1606;&#1592;&#1575;&#1605;</span></h3>
+    <p style="font-size:0.92rem;line-height:1.8;color:#444">
+      <span class="lang-en">Ragtools is the local AI-powered knowledge base system deployed on the IT PM workstation. It indexes Markdown files from 43 project folders on the D:\ drive, embedding them into a Qdrant vector database using the <code>all-MiniLM-L6-v2</code> sentence-transformer model (384 dimensions, Cosine distance). The system enables semantic search across all project documentation via MCP tools integrated with Claude Code.</span>
+      <span class="lang-ar">Ragtools &#1607;&#1608; &#1606;&#1592;&#1575;&#1605; &#1602;&#1575;&#1593;&#1583;&#1577; &#1575;&#1604;&#1605;&#1593;&#1585;&#1601;&#1577; &#1575;&#1604;&#1605;&#1581;&#1604;&#1610; &#1575;&#1604;&#1605;&#1583;&#1593;&#1608;&#1605; &#1576;&#1575;&#1604;&#1584;&#1603;&#1575;&#1569; &#1575;&#1604;&#1575;&#1589;&#1591;&#1606;&#1575;&#1593;&#1610; &#1575;&#1604;&#1605;&#1606;&#1588;&#1608;&#1585; &#1593;&#1604;&#1609; &#1580;&#1607;&#1575;&#1586; &#1605;&#1583;&#1610;&#1585; &#1605;&#1588;&#1575;&#1585;&#1610;&#1593; &#1578;&#1602;&#1606;&#1610;&#1577; &#1575;&#1604;&#1605;&#1593;&#1604;&#1608;&#1605;&#1575;&#1578;. &#1610;&#1602;&#1608;&#1605; &#1576;&#1601;&#1607;&#1585;&#1587;&#1577; &#1605;&#1604;&#1601;&#1575;&#1578; Markdown &#1605;&#1606; 43 &#1605;&#1580;&#1604;&#1583; &#1605;&#1588;&#1585;&#1608;&#1593; &#1593;&#1604;&#1609; &#1602;&#1585;&#1589; D:\.</span>
+    </p>
+  </div>
+
+  <div class="card">
+    <h3><span class="lang-en">Verdict</span><span class="lang-ar">&#1575;&#1604;&#1581;&#1603;&#1605;</span></h3>
+    <table>
+      <tr><th style="width:40%"><span class="lang-en">Aspect</span><span class="lang-ar">&#1575;&#1604;&#1580;&#1575;&#1606;&#1576;</span></th><th><span class="lang-en">Status</span><span class="lang-ar">&#1575;&#1604;&#1581;&#1575;&#1604;&#1577;</span></th></tr>
+      <tr><td><span class="lang-en">Search Capability</span><span class="lang-ar">&#1602;&#1583;&#1585;&#1577; &#1575;&#1604;&#1576;&#1581;&#1579;</span></td><td><span class="badge badge-up">Operational</span></td></tr>
+      <tr><td><span class="lang-en">Index Coverage</span><span class="lang-ar">&#1578;&#1594;&#1591;&#1610;&#1577; &#1575;&#1604;&#1601;&#1607;&#1585;&#1587;</span></td><td><span class="badge badge-up">43 Projects</span></td></tr>
+      <tr><td><span class="lang-en">HTTP Service</span><span class="lang-ar">&#1582;&#1583;&#1605;&#1577; HTTP</span></td><td><span class="badge badge-down">Down (PID mismatch)</span></td></tr>
+      <tr><td><span class="lang-en">MCP Direct Mode</span><span class="lang-ar">&#1608;&#1590;&#1593; MCP</span></td><td><span class="badge badge-up">Functional</span></td></tr>
+      <tr><td><span class="lang-en">Qdrant Performance</span><span class="lang-ar">&#1571;&#1583;&#1575;&#1569; Qdrant</span></td><td><span class="badge badge-warn">27,604 pts (>20K limit)</span></td></tr>
+      <tr><td><span class="lang-en">Governance</span><span class="lang-ar">&#1575;&#1604;&#1581;&#1608;&#1603;&#1605;&#1577;</span></td><td><span class="badge badge-up">RAG-FIRST Rule Active</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==== SECTION 2: TIMELINE ==== -->
+<div id="sec-timeline" class="section">
+  <h2>
+    <span class="lang-en">Timeline — Apr 12 to Apr 16, 2026</span>
+    <span class="lang-ar">&#1575;&#1604;&#1580;&#1583;&#1608;&#1604; &#1575;&#1604;&#1586;&#1605;&#1606;&#1610; — 12 &#1573;&#1604;&#1609; 16 &#1571;&#1576;&#1585;&#1610;&#1604; 2026</span>
+  </h2>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="day">Day 1 — April 12, 2026</div>
+      <h3><span class="lang-en">Installation & Initial Indexing</span><span class="lang-ar">&#1575;&#1604;&#1578;&#1579;&#1576;&#1610;&#1578; &#1608;&#1575;&#1604;&#1601;&#1607;&#1585;&#1587;&#1577; &#1575;&#1604;&#1571;&#1608;&#1604;&#1610;&#1577;</span></h3>
+      <ul>
+        <li><span class="lang-en">Ragtools installed at <code>AppData\Local\Programs\RAGTools\rag.exe</code></span><span class="lang-ar">&#1578;&#1605; &#1578;&#1579;&#1576;&#1610;&#1578; Ragtools</span></li>
+        <li><span class="lang-en">42 projects registered (IDs 1-42)</span><span class="lang-ar">&#1578;&#1605; &#1578;&#1587;&#1580;&#1610;&#1604; 42 &#1605;&#1588;&#1585;&#1608;&#1593;</span></li>
+        <li><span class="lang-en">Qdrant embedded database initialized (173 MB)</span><span class="lang-ar">&#1578;&#1605; &#1578;&#1607;&#1610;&#1574;&#1577; &#1602;&#1575;&#1593;&#1583;&#1577; &#1576;&#1610;&#1575;&#1606;&#1575;&#1578; Qdrant</span></li>
+        <li><span class="lang-en">Batch script generated 37 folder-name.md files</span><span class="lang-ar">&#1578;&#1605; &#1573;&#1606;&#1588;&#1575;&#1569; 37 &#1605;&#1604;&#1601; MD</span></li>
+        <li><span class="lang-en"><code>scan_baseline.json</code> created</span><span class="lang-ar">&#1578;&#1605; &#1573;&#1606;&#1588;&#1575;&#1569; &#1605;&#1604;&#1601; &#1575;&#1604;&#1571;&#1587;&#1575;&#1587;</span></li>
+        <li style="color:var(--danger)"><span class="lang-en">Bug: Batch script silently skipped parenthesized folder names</span><span class="lang-ar">&#1582;&#1591;&#1571;: &#1575;&#1604;&#1576;&#1585;&#1606;&#1575;&#1605;&#1580; &#1578;&#1582;&#1591;&#1609; &#1571;&#1587;&#1605;&#1575;&#1569; &#1575;&#1604;&#1605;&#1580;&#1604;&#1583;&#1575;&#1578; &#1576;&#1571;&#1602;&#1608;&#1575;&#1587;</span></li>
+      </ul>
+    </div>
+
+    <div class="timeline-item">
+      <div class="day">Day 2 — April 13, 2026</div>
+      <h3><span class="lang-en">Coverage Audit & 6 Lessons Learned</span><span class="lang-ar">&#1578;&#1583;&#1602;&#1610;&#1602; &#1575;&#1604;&#1578;&#1594;&#1591;&#1610;&#1577; &#1608;6 &#1583;&#1585;&#1608;&#1587;</span></h3>
+      <ul>
+        <li><span class="lang-en">3-check coverage audit revealed 4 gaps</span><span class="lang-ar">&#1578;&#1583;&#1602;&#1610;&#1602; 3 &#1605;&#1585;&#1575;&#1581;&#1604; &#1603;&#1588;&#1601; 4 &#1601;&#1580;&#1608;&#1575;&#1578;</span></li>
+        <li><span class="lang-en">Missing <code>KhairGate (HUB).md</code> created</span><span class="lang-ar">&#1578;&#1605; &#1573;&#1606;&#1588;&#1575;&#1569; &#1575;&#1604;&#1605;&#1604;&#1601; &#1575;&#1604;&#1605;&#1601;&#1602;&#1608;&#1583;</span></li>
+        <li><span class="lang-en">Project #43 added: <code>project-management-quarter-plan</code></span><span class="lang-ar">&#1578;&#1605;&#1578; &#1573;&#1590;&#1575;&#1601;&#1577; &#1575;&#1604;&#1605;&#1588;&#1585;&#1608;&#1593; &#1585;&#1602;&#1605; 43</span></li>
+        <li><span class="lang-en">WebFetch HTTP&rarr;HTTPS issue discovered &rarr; switched to curl</span><span class="lang-ar">&#1578;&#1605; &#1575;&#1603;&#1578;&#1588;&#1575;&#1601; &#1605;&#1588;&#1603;&#1604;&#1577; WebFetch</span></li>
+        <li><span class="lang-en"><strong>Lessons #363-368</strong> codified in global_lessons.md</span><span class="lang-ar">&#1578;&#1605; &#1578;&#1608;&#1579;&#1610;&#1602; &#1575;&#1604;&#1583;&#1585;&#1608;&#1587; #363-368</span></li>
+      </ul>
+    </div>
+
+    <div class="timeline-item">
+      <div class="day">Day 3 — April 14, 2026</div>
+      <h3><span class="lang-en">Plugin v0.4.0 & Functional Test</span><span class="lang-ar">&#1573;&#1589;&#1583;&#1575;&#1585; 0.4.0 &#1608;&#1575;&#1582;&#1578;&#1576;&#1575;&#1585; &#1608;&#1592;&#1610;&#1601;&#1610;</span></h3>
+      <ul>
+        <li><span class="lang-en">Plugin upgraded: 9 commands &rarr; 6 (consolidated)</span><span class="lang-ar">&#1578;&#1605; &#1578;&#1585;&#1602;&#1610;&#1577; &#1575;&#1604;&#1573;&#1590;&#1575;&#1601;&#1577;: 9 &#1571;&#1608;&#1575;&#1605;&#1585; &rarr; 6</span></li>
+        <li><span class="lang-en">Windows stdio pipe bug fixed</span><span class="lang-ar">&#1578;&#1605; &#1573;&#1589;&#1604;&#1575;&#1581; &#1582;&#1591;&#1571; &#1571;&#1606;&#1576;&#1608;&#1576; stdio</span></li>
+        <li><span class="lang-en">Test: 705 files, 33,331 chunks, 43 projects verified</span><span class="lang-ar">&#1575;&#1582;&#1578;&#1576;&#1575;&#1585;: 705 &#1605;&#1604;&#1601;&#1548; 33,331 &#1580;&#1586;&#1569;</span></li>
+        <li><span class="lang-en">Search quality: 0.47-0.72 on topical queries</span><span class="lang-ar">&#1580;&#1608;&#1583;&#1577; &#1575;&#1604;&#1576;&#1581;&#1579;: 0.47-0.72</span></li>
+      </ul>
+    </div>
+
+    <div class="timeline-item">
+      <div class="day">Day 4 — April 15, 2026</div>
+      <h3><span class="lang-en">RAG-FIRST RULE Activated</span><span class="lang-ar">&#1578;&#1601;&#1593;&#1610;&#1604; &#1602;&#1575;&#1593;&#1583;&#1577; RAG-FIRST</span></h3>
+      <ul>
+        <li><span class="lang-en">RAG-FIRST RULE added as line 1 of CLAUDE.md</span><span class="lang-ar">&#1578;&#1605;&#1578; &#1573;&#1590;&#1575;&#1601;&#1577; &#1602;&#1575;&#1593;&#1583;&#1577; RAG-FIRST</span></li>
+        <li><span class="lang-en">Mandates <code>search_knowledge_base</code> before any domain answer</span><span class="lang-ar">&#1610;&#1604;&#1586;&#1605; &#1575;&#1604;&#1576;&#1581;&#1579; &#1602;&#1576;&#1604; &#1571;&#1610; &#1573;&#1580;&#1575;&#1576;&#1577;</span></li>
+        <li><span class="lang-en">3 narrow exemptions defined</span><span class="lang-ar">&#1578;&#1605; &#1578;&#1581;&#1583;&#1610;&#1583; 3 &#1575;&#1587;&#1578;&#1579;&#1606;&#1575;&#1569;&#1575;&#1578;</span></li>
+        <li><span class="lang-en">Workspace reorganization (Taqat repos moved)</span><span class="lang-ar">&#1573;&#1593;&#1575;&#1583;&#1577; &#1578;&#1606;&#1592;&#1610;&#1605; &#1605;&#1587;&#1575;&#1581;&#1577; &#1575;&#1604;&#1593;&#1605;&#1604;</span></li>
+      </ul>
+    </div>
+
+    <div class="timeline-item">
+      <div class="day">Day 5 — April 16, 2026 (Today)</div>
+      <h3><span class="lang-en">Current Assessment</span><span class="lang-ar">&#1575;&#1604;&#1578;&#1602;&#1610;&#1610;&#1605; &#1575;&#1604;&#1581;&#1575;&#1604;&#1610;</span></h3>
+      <ul>
+        <li><span class="lang-en">Service started at 10:03 (PID 16236) then crashed</span><span class="lang-ar">&#1576;&#1583;&#1571;&#1578; &#1575;&#1604;&#1582;&#1583;&#1605;&#1577; &#1575;&#1604;&#1587;&#1575;&#1593;&#1577; 10:03 &#1579;&#1605; &#1578;&#1593;&#1591;&#1604;&#1578;</span></li>
+        <li><span class="lang-en">Startup sync: 167 indexed, 87 deleted, 517 unchanged</span><span class="lang-ar">&#1605;&#1586;&#1575;&#1605;&#1606;&#1577; &#1575;&#1604;&#1576;&#1583;&#1569;: 167 &#1605;&#1601;&#1607;&#1585;&#1587;&#1548; 87 &#1605;&#1581;&#1584;&#1608;&#1601;</span></li>
+        <li><span class="lang-en">Chunks: 33,331 &rarr; 28,741 (-13.8%)</span><span class="lang-ar">&#1575;&#1604;&#1571;&#1580;&#1586;&#1575;&#1569;: 33,331 &rarr; 28,741</span></li>
+        <li><span class="lang-en">MCP direct mode: fully functional (3 rag.exe processes)</span><span class="lang-ar">&#1608;&#1590;&#1593; MCP: &#1610;&#1593;&#1605;&#1604; &#1576;&#1575;&#1604;&#1603;&#1575;&#1605;&#1604;</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ==== SECTION 3: COVERAGE ==== -->
+<div id="sec-coverage" class="section">
+  <h2>
+    <span class="lang-en">Coverage Audit — 43 Indexed Projects</span>
+    <span class="lang-ar">&#1578;&#1583;&#1602;&#1610;&#1602; &#1575;&#1604;&#1578;&#1594;&#1591;&#1610;&#1577; — 43 &#1605;&#1588;&#1585;&#1608;&#1593;</span>
+  </h2>
+
+  <div class="kpi-strip">
+    <div class="kpi-card"><div class="value">11</div><div class="label">KhairGate HUB</div></div>
+    <div class="kpi-card"><div class="value">10</div><div class="label">Project Management</div></div>
+    <div class="kpi-card"><div class="value">4</div><div class="label">DevOps</div></div>
+    <div class="kpi-card"><div class="value">3</div><div class="label">Personal</div></div>
+    <div class="kpi-card"><div class="value">2</div><div class="label">HR</div></div>
+    <div class="kpi-card"><div class="value">13</div><div class="label"><span class="lang-en">Other Projects</span><span class="lang-ar">&#1605;&#1588;&#1575;&#1585;&#1610;&#1593; &#1571;&#1582;&#1585;&#1609;</span></div></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="lang-en">Full Project Registry</span><span class="lang-ar">&#1587;&#1580;&#1604; &#1575;&#1604;&#1605;&#1588;&#1575;&#1585;&#1610;&#1593; &#1575;&#1604;&#1603;&#1575;&#1605;&#1604;</span></h3>
+    <table>
+      <thead>
+        <tr><th>ID</th><th><span class="lang-en">Name</span><span class="lang-ar">&#1575;&#1604;&#1575;&#1587;&#1605;</span></th><th><span class="lang-en">Category</span><span class="lang-ar">&#1575;&#1604;&#1601;&#1574;&#1577;</span></th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Global Lessons</td><td><span class="badge badge-info">Cross-cutting</span></td></tr>
+        <tr><td>2</td><td>KhairGate HUB-xhatem-Github</td><td><span class="badge badge-neutral">HUB</span></td></tr>
+        <tr><td>3</td><td>KhairGate HUB-Investigation Results</td><td><span class="badge badge-neutral">HUB</span></td></tr>
+        <tr><td>4</td><td>KhairGate HUB-khairworld-trial-main V.4</td><td><span class="badge badge-neutral">HUB</span></td></tr>
+        <tr><td>5</td><td>KhairGate HUB-Mixed-Mode</td><td><span class="badge badge-neutral">HUB</span></td></tr>
+        <tr><td>6</td><td>KhairGate HUB-Migration_Analysis (Basha)</td><td><span class="badge badge-neutral">HUB</span></td></tr>
+        <tr><td>7</td><td>KhairGate HUB-KhairGateWorld-Repository</td><td><span class="badge badge-neutral">HUB</span></td></tr>
+        <tr><td>8</td><td>KhairGate HUB-KhairWorld BRD</td><td><span class="badge badge-neutral">HUB</span></td></tr>
+        <tr><td>9</td><td>Project Management-Source-Root</td><td><span class="badge badge-info">PM</span></td></tr>
+        <tr><td>10</td><td>PM-QA-QC & Dev Activity RACI</td><td><span class="badge badge-info">PM</span></td></tr>
+        <tr><td>11</td><td>PM-Monthly Reports</td><td><span class="badge badge-info">PM</span></td></tr>
+        <tr><td>12</td><td>PM-Department Workflows</td><td><span class="badge badge-info">PM</span></td></tr>
+        <tr><td>13</td><td>PM-Weekly Meeting</td><td><span class="badge badge-info">PM</span></td></tr>
+        <tr><td>14</td><td>PM-Taqat Alignment Framework</td><td><span class="badge badge-info">PM</span></td></tr>
+        <tr><td>15</td><td>PM-Outlook</td><td><span class="badge badge-info">PM</span></td></tr>
+        <tr><td>16</td><td>PM-OKR & KPI</td><td><span class="badge badge-info">PM</span></td></tr>
+        <tr><td>17</td><td>PM-Claude Courses</td><td><span class="badge badge-info">PM</span></td></tr>
+        <tr><td>18</td><td>DevOps-Semir Reports</td><td><span class="badge badge-warn">DevOps</span></td></tr>
+        <tr><td>19</td><td>DevOps-Process Best Practice Rules</td><td><span class="badge badge-warn">DevOps</span></td></tr>
+        <tr><td>20</td><td>DevOps-Bug Criteria</td><td><span class="badge badge-warn">DevOps</span></td></tr>
+        <tr><td>21</td><td>DevOps-General</td><td><span class="badge badge-warn">DevOps</span></td></tr>
+        <tr><td>22</td><td>Udemy</td><td><span class="badge badge-neutral">Training</span></td></tr>
+        <tr><td>23</td><td>HR-Senior Odoo Developer</td><td><span class="badge badge-neutral">HR</span></td></tr>
+        <tr><td>24</td><td>HR-Software QC Engineer</td><td><span class="badge badge-neutral">HR</span></td></tr>
+        <tr><td>25</td><td>Water for Mosques</td><td><span class="badge badge-neutral">Project</span></td></tr>
+        <tr><td>26</td><td>Alaqraboon</td><td><span class="badge badge-neutral">Project</span></td></tr>
+        <tr><td>27</td><td>Personal-Scrum Master</td><td><span class="badge badge-neutral">Personal</span></td></tr>
+        <tr><td>28</td><td>Personal-Hatem</td><td><span class="badge badge-neutral">Personal</span></td></tr>
+        <tr><td>29</td><td>Personal-PM2Agile</td><td><span class="badge badge-neutral">Personal</span></td></tr>
+        <tr><td>30</td><td>Relief Center</td><td><span class="badge badge-neutral">Project</span></td></tr>
+        <tr><td>31</td><td>BMS</td><td><span class="badge badge-neutral">Project</span></td></tr>
+        <tr><td>32</td><td>KhairGate Wallet (original)</td><td><span class="badge badge-neutral">Project</span></td></tr>
+        <tr><td>33</td><td>TfsData</td><td><span class="badge badge-neutral">Data</span></td></tr>
+        <tr><td>34</td><td>Taqat Trading & Business Solutions</td><td><span class="badge badge-neutral">Project</span></td></tr>
+        <tr><td>35</td><td>Afriqat</td><td><span class="badge badge-neutral">Project</span></td></tr>
+        <tr><td>36</td><td>IndoQat</td><td><span class="badge badge-neutral">Project</span></td></tr>
+        <tr><td>37</td><td>Herbal Gardens</td><td><span class="badge badge-neutral">Project</span></td></tr>
+        <tr><td>38</td><td>KhairGate HUB-Hub-Analysis</td><td><span class="badge badge-neutral">HUB</span></td></tr>
+        <tr><td>39</td><td>KhairGate HUB-Hub-Analysis-V2</td><td><span class="badge badge-neutral">HUB</span></td></tr>
+        <tr><td>40</td><td>KhairGate HUB-Migration (xhatem)</td><td><span class="badge badge-neutral">HUB</span></td></tr>
+        <tr><td>41</td><td>KhairGate HUB-Mixed-Mode (xhatem)</td><td><span class="badge badge-neutral">HUB</span></td></tr>
+        <tr><td>42</td><td>KhairGate Wallet</td><td><span class="badge badge-neutral">Project</span></td></tr>
+        <tr><td>QP</td><td>PM-Quarter Plan</td><td><span class="badge badge-info">PM</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ==== SECTION 4: LESSONS ==== -->
+<div id="sec-lessons" class="section">
+  <h2>
+    <span class="lang-en">Incidents & Lessons Learned (#363-368)</span>
+    <span class="lang-ar">&#1575;&#1604;&#1581;&#1608;&#1575;&#1583;&#1579; &#1608;&#1575;&#1604;&#1583;&#1585;&#1608;&#1587; &#1575;&#1604;&#1605;&#1587;&#1578;&#1601;&#1575;&#1583;&#1577;</span>
+  </h2>
+
+  <div class="lesson-card high">
+    <div class="lesson-num">#363 — <span class="lang-en">HIGH</span><span class="lang-ar">&#1593;&#1575;&#1604;&#1610;</span></div>
+    <div class="lesson-title"><span class="lang-en">Coverage Audit Requires 3 Checks, Not 1</span><span class="lang-ar">&#1578;&#1583;&#1602;&#1610;&#1602; &#1575;&#1604;&#1578;&#1594;&#1591;&#1610;&#1577; &#1610;&#1578;&#1591;&#1604;&#1576; 3 &#1601;&#1581;&#1608;&#1589;&#1575;&#1578;</span></div>
+    <div class="lesson-detail"><span class="lang-en">Answered "no new folders" but missed sub-folder drift. Rule: every audit must check (1) new top-level folders vs baseline, (2) every folder's root MD, (3) live RAG list diff.</span><span class="lang-ar">&#1571;&#1580;&#1576;&#1578; "&#1604;&#1575; &#1605;&#1580;&#1604;&#1583;&#1575;&#1578; &#1580;&#1583;&#1610;&#1583;&#1577;" &#1608;&#1604;&#1603;&#1606; &#1601;&#1575;&#1578;&#1606;&#1610; &#1575;&#1606;&#1581;&#1585;&#1575;&#1601; &#1575;&#1604;&#1605;&#1580;&#1604;&#1583;&#1575;&#1578; &#1575;&#1604;&#1601;&#1585;&#1593;&#1610;&#1577;.</span></div>
+  </div>
+
+  <div class="lesson-card">
+    <div class="lesson-num">#364 — <span class="lang-en">MEDIUM</span><span class="lang-ar">&#1605;&#1578;&#1608;&#1587;&#1591;</span></div>
+    <div class="lesson-title"><span class="lang-en">RAG Entries Are Per Sub-Session, Not Per Root Folder</span><span class="lang-ar">&#1573;&#1583;&#1582;&#1575;&#1604;&#1575;&#1578; RAG &#1604;&#1603;&#1604; &#1580;&#1604;&#1587;&#1577; &#1601;&#1585;&#1593;&#1610;&#1577;</span></div>
+    <div class="lesson-detail"><span class="lang-en">Nearly added a duplicate root entry that would have bloated the index. Check existing sub-entries before adding.</span><span class="lang-ar">&#1603;&#1575;&#1583;&#1578; &#1578;&#1590;&#1575;&#1601; &#1573;&#1583;&#1582;&#1575;&#1604;&#1577; &#1605;&#1603;&#1585;&#1585;&#1577;. &#1610;&#1580;&#1576; &#1575;&#1604;&#1578;&#1581;&#1602;&#1602; &#1602;&#1576;&#1604; &#1575;&#1604;&#1573;&#1590;&#1575;&#1601;&#1577;.</span></div>
+  </div>
+
+  <div class="lesson-card">
+    <div class="lesson-num">#365 — <span class="lang-en">MEDIUM</span><span class="lang-ar">&#1605;&#1578;&#1608;&#1587;&#1591;</span></div>
+    <div class="lesson-title"><span class="lang-en">WebFetch Auto-Upgrades HTTP to HTTPS</span><span class="lang-ar">WebFetch &#1610;&#1585;&#1602;&#1610; HTTP &#1573;&#1604;&#1609; HTTPS &#1578;&#1604;&#1602;&#1575;&#1574;&#1610;&#1575;&#1611;</span></div>
+    <div class="lesson-detail"><span class="lang-en">WebFetch to localhost:21420 returned ECONNREFUSED. Use <code>curl</code> via Bash for all localhost services.</span><span class="lang-ar">WebFetch &#1573;&#1604;&#1609; localhost &#1571;&#1585;&#1580;&#1593; &#1582;&#1591;&#1571;. &#1575;&#1587;&#1578;&#1582;&#1583;&#1605; curl &#1604;&#1580;&#1605;&#1610;&#1593; &#1575;&#1604;&#1582;&#1583;&#1605;&#1575;&#1578; &#1575;&#1604;&#1605;&#1581;&#1604;&#1610;&#1577;.</span></div>
+  </div>
+
+  <div class="lesson-card">
+    <div class="lesson-num">#366 — <span class="lang-en">MEDIUM</span><span class="lang-ar">&#1605;&#1578;&#1608;&#1587;&#1591;</span></div>
+    <div class="lesson-title"><span class="lang-en">Baselines Go Stale Within 24 Hours</span><span class="lang-ar">&#1575;&#1604;&#1571;&#1587;&#1575;&#1587;&#1575;&#1578; &#1578;&#1589;&#1576;&#1581; &#1602;&#1583;&#1610;&#1605;&#1577; &#1582;&#1604;&#1575;&#1604; 24 &#1587;&#1575;&#1593;&#1577;</span></div>
+    <div class="lesson-detail"><span class="lang-en">Baseline from Apr 12 missed a folder created 20 hours later. Always cross-check against live sources.</span><span class="lang-ar">&#1575;&#1604;&#1571;&#1587;&#1575;&#1587; &#1605;&#1606; 12 &#1571;&#1576;&#1585;&#1610;&#1604; &#1601;&#1575;&#1578;&#1607; &#1605;&#1580;&#1604;&#1583; &#1571;&#1615;&#1606;&#1588;&#1574; &#1576;&#1593;&#1583; 20 &#1587;&#1575;&#1593;&#1577;.</span></div>
+  </div>
+
+  <div class="lesson-card high">
+    <div class="lesson-num">#367 — <span class="lang-en">HIGH</span><span class="lang-ar">&#1593;&#1575;&#1604;&#1610;</span></div>
+    <div class="lesson-title"><span class="lang-en">Batch Scripts Skip Special Characters Silently</span><span class="lang-ar">&#1575;&#1604;&#1576;&#1585;&#1575;&#1605;&#1580; &#1578;&#1578;&#1582;&#1591;&#1609; &#1575;&#1604;&#1571;&#1581;&#1585;&#1601; &#1575;&#1604;&#1582;&#1575;&#1589;&#1577; &#1576;&#1589;&#1605;&#1578;</span></div>
+    <div class="lesson-detail"><span class="lang-en">Batch created 37 files but silently skipped <code>KhairGate (HUB)</code>. Test against edge-case names before batch runs.</span><span class="lang-ar">&#1575;&#1604;&#1576;&#1585;&#1606;&#1575;&#1605;&#1580; &#1571;&#1606;&#1588;&#1571; 37 &#1605;&#1604;&#1601; &#1608;&#1578;&#1582;&#1591;&#1609; KhairGate (HUB) &#1576;&#1589;&#1605;&#1578;.</span></div>
+  </div>
+
+  <div class="lesson-card">
+    <div class="lesson-num">#368 — <span class="lang-en">LOW</span><span class="lang-ar">&#1605;&#1606;&#1582;&#1601;&#1590;</span></div>
+    <div class="lesson-title"><span class="lang-en">Remove-Then-Re-Add for RAG Updates</span><span class="lang-ar">&#1581;&#1584;&#1601; &#1579;&#1605; &#1573;&#1593;&#1575;&#1583;&#1577; &#1573;&#1590;&#1575;&#1601;&#1577; &#1604;&#1578;&#1581;&#1583;&#1610;&#1579;&#1575;&#1578; RAG</span></div>
+    <div class="lesson-detail"><span class="lang-en">Existing entries must be deleted before re-adding (stale cache). New entries go directly via POST.</span><span class="lang-ar">&#1610;&#1580;&#1576; &#1581;&#1584;&#1601; &#1575;&#1604;&#1573;&#1583;&#1582;&#1575;&#1604;&#1575;&#1578; &#1575;&#1604;&#1581;&#1575;&#1604;&#1610;&#1577; &#1602;&#1576;&#1604; &#1573;&#1593;&#1575;&#1583;&#1577; &#1573;&#1590;&#1575;&#1601;&#1578;&#1607;&#1575;.</span></div>
+  </div>
+</div>
+
+<!-- ==== SECTION 5: RAG-FIRST RULE ==== -->
+<div id="sec-ragfirst" class="section">
+  <h2>
+    <span class="lang-en">RAG-FIRST Rule</span>
+    <span class="lang-ar">&#1602;&#1575;&#1593;&#1583;&#1577; RAG-FIRST</span>
+  </h2>
+
+  <div class="card" style="border-left:4px solid var(--primary)">
+    <h3><span class="lang-en">Rule Statement (Effective Apr 15, 2026)</span><span class="lang-ar">&#1606;&#1589; &#1575;&#1604;&#1602;&#1575;&#1593;&#1583;&#1577; (&#1587;&#1575;&#1585;&#1610;&#1577; &#1605;&#1606; 15 &#1571;&#1576;&#1585;&#1610;&#1604; 2026)</span></h3>
+    <p style="font-size:0.92rem;line-height:1.8;color:#444;font-style:italic;background:#f8f9ff;padding:16px;border-radius:8px;margin-top:12px">
+      <span class="lang-en">"For EVERY question I ask &mdash; domain, PM, project, DevOps, lessons, decisions, file locations, versions, history, conventions &mdash; you MUST call <code>search_knowledge_base</code> FIRST before answering, unless the question is one of these narrow exemptions."</span>
+      <span class="lang-ar">"&#1604;&#1603;&#1604; &#1587;&#1572;&#1575;&#1604; &#1571;&#1591;&#1585;&#1581;&#1607; &mdash; &#1605;&#1580;&#1575;&#1604;&#1548; &#1573;&#1583;&#1575;&#1585;&#1577; &#1605;&#1588;&#1575;&#1585;&#1610;&#1593;&#1548; DevOps&#1548; &#1583;&#1585;&#1608;&#1587;&#1548; &#1602;&#1585;&#1575;&#1585;&#1575;&#1578; &mdash; &#1610;&#1580;&#1576; &#1575;&#1587;&#1578;&#1583;&#1593;&#1575;&#1569; <code>search_knowledge_base</code> &#1571;&#1608;&#1604;&#1575;&#1611;."</span>
+    </p>
+  </div>
+
+  <div class="card">
+    <h3><span class="lang-en">Exemptions</span><span class="lang-ar">&#1575;&#1604;&#1575;&#1587;&#1578;&#1579;&#1606;&#1575;&#1569;&#1575;&#1578;</span></h3>
+    <table>
+      <tr><th>#</th><th><span class="lang-en">Exemption</span><span class="lang-ar">&#1575;&#1604;&#1575;&#1587;&#1578;&#1579;&#1606;&#1575;&#1569;</span></th><th><span class="lang-en">Example</span><span class="lang-ar">&#1605;&#1579;&#1575;&#1604;</span></th></tr>
+      <tr><td>a</td><td><span class="lang-en">Answer in current turn's context</span><span class="lang-ar">&#1575;&#1604;&#1573;&#1580;&#1575;&#1576;&#1577; &#1601;&#1610; &#1587;&#1610;&#1575;&#1602; &#1575;&#1604;&#1583;&#1608;&#1585; &#1575;&#1604;&#1581;&#1575;&#1604;&#1610;</span></td><td><span class="lang-en">Tool results from same turn</span><span class="lang-ar">&#1606;&#1578;&#1575;&#1574;&#1580; &#1575;&#1604;&#1571;&#1583;&#1608;&#1575;&#1578; &#1605;&#1606; &#1606;&#1601;&#1587; &#1575;&#1604;&#1583;&#1608;&#1585;</span></td></tr>
+      <tr><td>b</td><td><span class="lang-en">Ragtools product operations</span><span class="lang-ar">&#1593;&#1605;&#1604;&#1610;&#1575;&#1578; &#1605;&#1606;&#1578;&#1580; Ragtools</span></td><td><span class="lang-en">Use /rag-doctor, /rag-setup</span><span class="lang-ar">&#1575;&#1587;&#1578;&#1582;&#1583;&#1605; /rag-doctor</span></td></tr>
+      <tr><td>c</td><td><span class="lang-en">Pure general knowledge</span><span class="lang-ar">&#1605;&#1593;&#1585;&#1601;&#1577; &#1593;&#1575;&#1605;&#1577; &#1576;&#1581;&#1578;&#1577;</span></td><td><span class="lang-en">Math, trivia, public APIs</span><span class="lang-ar">&#1585;&#1610;&#1575;&#1590;&#1610;&#1575;&#1578;&#1548; &#1605;&#1593;&#1604;&#1608;&#1605;&#1575;&#1578; &#1593;&#1575;&#1605;&#1577;</span></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3><span class="lang-en">Search Discipline</span><span class="lang-ar">&#1575;&#1606;&#1590;&#1576;&#1575;&#1591; &#1575;&#1604;&#1576;&#1581;&#1579;</span></h3>
+    <table>
+      <tr><th><span class="lang-en">Score Range</span><span class="lang-ar">&#1606;&#1591;&#1575;&#1602; &#1575;&#1604;&#1606;&#1578;&#1610;&#1580;&#1577;</span></th><th><span class="lang-en">Action</span><span class="lang-ar">&#1575;&#1604;&#1573;&#1580;&#1585;&#1575;&#1569;</span></th></tr>
+      <tr><td><span class="badge badge-up">&ge; 0.7</span></td><td><span class="lang-en">Ground answer, cite source files inline</span><span class="lang-ar">&#1575;&#1587;&#1578;&#1606;&#1575;&#1583; &#1575;&#1604;&#1573;&#1580;&#1575;&#1576;&#1577; &#1608;&#1575;&#1604;&#1575;&#1587;&#1578;&#1588;&#1607;&#1575;&#1583; &#1576;&#1575;&#1604;&#1605;&#1604;&#1601;&#1575;&#1578;</span></td></tr>
+      <tr><td><span class="badge badge-warn">0.5 – 0.7</span></td><td><span class="lang-en">Use as context, label "from my notes:", suggest verify</span><span class="lang-ar">&#1575;&#1587;&#1578;&#1582;&#1583;&#1605; &#1603;&#1587;&#1610;&#1575;&#1602;&#1548; &#1575;&#1602;&#1578;&#1585;&#1581; &#1575;&#1604;&#1578;&#1581;&#1602;&#1602;</span></td></tr>
+      <tr><td><span class="badge badge-down">&lt; 0.5</span></td><td><span class="lang-en">One reformulated query; then state "checked, not found"</span><span class="lang-ar">&#1575;&#1587;&#1578;&#1593;&#1604;&#1575;&#1605; &#1605;&#1593;&#1575;&#1583; &#1579;&#1605; "&#1578;&#1605; &#1575;&#1604;&#1578;&#1581;&#1602;&#1602;&#1548; &#1604;&#1605; &#1610;&#1578;&#1605; &#1575;&#1604;&#1593;&#1579;&#1608;&#1585;"</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==== SECTION 6: HEALTH ==== -->
+<div id="sec-health" class="section">
+  <h2>
+    <span class="lang-en">Current Health & Diagnostics</span>
+    <span class="lang-ar">&#1575;&#1604;&#1589;&#1581;&#1577; &#1575;&#1604;&#1581;&#1575;&#1604;&#1610;&#1577; &#1608;&#1575;&#1604;&#1578;&#1588;&#1582;&#1610;&#1589;</span>
+  </h2>
+
+  <div class="card">
+    <h3><span class="lang-en">Component Status</span><span class="lang-ar">&#1581;&#1575;&#1604;&#1577; &#1575;&#1604;&#1605;&#1603;&#1608;&#1606;&#1575;&#1578;</span></h3>
+    <table>
+      <tr><th><span class="lang-en">Component</span><span class="lang-ar">&#1575;&#1604;&#1605;&#1603;&#1608;&#1606;</span></th><th><span class="lang-en">Status</span><span class="lang-ar">&#1575;&#1604;&#1581;&#1575;&#1604;&#1577;</span></th><th><span class="lang-en">Details</span><span class="lang-ar">&#1575;&#1604;&#1578;&#1601;&#1575;&#1589;&#1610;&#1604;</span></th></tr>
+      <tr><td>rag.exe binary</td><td><span class="badge badge-up">Installed</span></td><td><code>AppData\Local\Programs\RAGTools\rag.exe</code></td></tr>
+      <tr><td>config.toml</td><td><span class="badge badge-up">Valid</span></td><td>v2, 43 projects, modified Apr 13</td></tr>
+      <tr><td>Qdrant DB</td><td><span class="badge badge-warn">Active (warning)</span></td><td>173 MB, 28,741 chunks, 384-dim, Cosine</td></tr>
+      <tr><td>index_state.db</td><td><span class="badge badge-up">Active</span></td><td>457 KB, modified Apr 16 12:19</td></tr>
+      <tr><td>HTTP service</td><td><span class="badge badge-down">DOWN</span></td><td>PID 16236 dead; curl exit 7</td></tr>
+      <tr><td>MCP direct mode</td><td><span class="badge badge-up">UP</span></td><td>3 tools functional (3 rag.exe processes)</td></tr>
+      <tr><td>File watcher</td><td><span class="badge badge-warn">Was active</span></td><td>Tracked projects 1, 30 before service crash</td></tr>
+      <tr><td>Logs</td><td><span class="badge badge-up">Available</span></td><td><code>data/logs/service.log</code> (125 KB)</td></tr>
+    </table>
+  </div>
+
+  <div class="issue-card critical">
+    <div class="issue-title"><span class="lang-en">Issue 1: HTTP Service Down (PID Mismatch)</span><span class="lang-ar">&#1575;&#1604;&#1605;&#1588;&#1603;&#1604;&#1577; 1: &#1582;&#1583;&#1605;&#1577; HTTP &#1605;&#1578;&#1608;&#1602;&#1601;&#1577;</span></div>
+    <div class="issue-detail">
+      <span class="lang-en">
+        <strong>PID file:</strong> <code>service.pid</code> contains PID 16236<br>
+        <strong>Running processes:</strong> rag.exe PIDs 8100, 3548, 9764 (none match)<br>
+        <strong>Root cause:</strong> HTTP server (PID 16236) started at 10:03:46, completed startup sync by 10:13:58, but subsequently crashed<br>
+        <strong>Impact:</strong> HTTP endpoints (<code>/health</code>, <code>/ui/projects/list</code>) return connection refused<br>
+        <strong>Workaround:</strong> MCP direct mode works — all 3 tools functional<br>
+        <strong>Fix:</strong> Restart with <code>rag serve</code> or restart Claude Code session
+      </span>
+      <span class="lang-ar">
+        <strong>&#1575;&#1604;&#1587;&#1576;&#1576;:</strong> &#1582;&#1575;&#1583;&#1605; HTTP &#1576;&#1583;&#1571; &#1575;&#1604;&#1587;&#1575;&#1593;&#1577; 10:03 &#1579;&#1605; &#1578;&#1593;&#1591;&#1604;<br>
+        <strong>&#1575;&#1604;&#1581;&#1604;:</strong> &#1573;&#1593;&#1575;&#1583;&#1577; &#1578;&#1588;&#1594;&#1610;&#1604; <code>rag serve</code>
+      </span>
+    </div>
+  </div>
+
+  <div class="issue-card moderate">
+    <div class="issue-title"><span class="lang-en">Issue 2: Chunk Count Drop (33,331 &rarr; 28,741)</span><span class="lang-ar">&#1575;&#1604;&#1605;&#1588;&#1603;&#1604;&#1577; 2: &#1575;&#1606;&#1582;&#1601;&#1575;&#1590; &#1593;&#1583;&#1583; &#1575;&#1604;&#1571;&#1580;&#1586;&#1575;&#1569;</span></div>
+    <div class="issue-detail">
+      <span class="lang-en">
+        <strong>Drop:</strong> -4,590 chunks (-13.8%)<br>
+        <strong>Root cause (from logs):</strong> Startup sync on Apr 16 at 10:13:58 — 167 files indexed, <strong>87 files deleted</strong>, 517 unchanged<br>
+        <strong>Explanation:</strong> Between Apr 14-16, workspace reorganization moved/renamed files (lesson #388 — Taqat repos). The 87 deleted files had their chunks removed; 167 new files added fewer chunks than those removed<br>
+        <strong>Assessment:</strong> <span class="badge badge-up">Expected behavior</span> — index correctly reflects current filesystem
+      </span>
+      <span class="lang-ar">
+        <strong>&#1575;&#1604;&#1575;&#1606;&#1582;&#1601;&#1575;&#1590;:</strong> -4,590 &#1580;&#1586;&#1569; (-13.8%)<br>
+        <strong>&#1575;&#1604;&#1587;&#1576;&#1576;:</strong> &#1573;&#1593;&#1575;&#1583;&#1577; &#1578;&#1606;&#1592;&#1610;&#1605; &#1605;&#1587;&#1575;&#1581;&#1577; &#1575;&#1604;&#1593;&#1605;&#1604; &#1571;&#1583;&#1578; &#1573;&#1604;&#1609; &#1581;&#1584;&#1601; 87 &#1605;&#1604;&#1601;<br>
+        <strong>&#1575;&#1604;&#1578;&#1602;&#1610;&#1610;&#1605;:</strong> <span class="badge badge-up">&#1587;&#1604;&#1608;&#1603; &#1605;&#1578;&#1608;&#1602;&#1593;</span>
+      </span>
+    </div>
+  </div>
+
+  <div class="issue-card moderate">
+    <div class="issue-title"><span class="lang-en">Issue 3: Qdrant Local Mode Warning</span><span class="lang-ar">&#1575;&#1604;&#1605;&#1588;&#1603;&#1604;&#1577; 3: &#1578;&#1581;&#1584;&#1610;&#1585; &#1608;&#1590;&#1593; Qdrant &#1575;&#1604;&#1605;&#1581;&#1604;&#1610;</span></div>
+    <div class="issue-detail">
+      <span class="lang-en">
+        <strong>Warning:</strong> "Local mode is not recommended for collections with more than 20,000 points. Current collection contains 27,604 points."<br>
+        <strong>Impact:</strong> Potential performance degradation for large queries<br>
+        <strong>Recommendation:</strong> Monitor search latency; consider Docker deployment if it degrades
+      </span>
+      <span class="lang-ar">
+        <strong>&#1575;&#1604;&#1578;&#1581;&#1584;&#1610;&#1585;:</strong> &#1575;&#1604;&#1608;&#1590;&#1593; &#1575;&#1604;&#1605;&#1581;&#1604;&#1610; &#1594;&#1610;&#1585; &#1605;&#1608;&#1589;&#1609; &#1576;&#1607; &#1604;&#1571;&#1603;&#1579;&#1585; &#1605;&#1606; 20,000 &#1606;&#1602;&#1591;&#1577;<br>
+        <strong>&#1575;&#1604;&#1578;&#1608;&#1589;&#1610;&#1577;:</strong> &#1605;&#1585;&#1575;&#1602;&#1576;&#1577; &#1575;&#1604;&#1571;&#1583;&#1575;&#1569; &#1608;&#1575;&#1604;&#1578;&#1601;&#1603;&#1610;&#1585; &#1601;&#1610; Docker
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ==== SECTION 7: RECOMMENDATIONS ==== -->
+<div id="sec-recs" class="section">
+  <h2>
+    <span class="lang-en">Recommendations</span>
+    <span class="lang-ar">&#1575;&#1604;&#1578;&#1608;&#1589;&#1610;&#1575;&#1578;</span>
+  </h2>
+
+  <h3><span class="lang-en">Immediate</span><span class="lang-ar">&#1601;&#1608;&#1585;&#1610;</span></h3>
+
+  <div class="rec-card">
+    <div class="rec-num">1</div>
+    <div class="rec-body">
+      <div class="rec-title"><span class="lang-en">Restart HTTP Service</span><span class="lang-ar">&#1573;&#1593;&#1575;&#1583;&#1577; &#1578;&#1588;&#1594;&#1610;&#1604; &#1582;&#1583;&#1605;&#1577; HTTP</span></div>
+      <div class="rec-detail"><span class="lang-en">Run <code>rag serve</code> to restore port 21420 and the file watcher. This also picks up changes made while the service was down.</span><span class="lang-ar">&#1588;&#1594;&#1604; <code>rag serve</code> &#1604;&#1575;&#1587;&#1578;&#1593;&#1575;&#1583;&#1577; &#1575;&#1604;&#1605;&#1606;&#1601;&#1584; 21420 &#1608;&#1605;&#1585;&#1575;&#1602;&#1576; &#1575;&#1604;&#1605;&#1604;&#1601;&#1575;&#1578;.</span></div>
+      <div class="rec-priority"><span class="badge badge-down">Critical</span></div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rec-num">2</div>
+    <div class="rec-body">
+      <div class="rec-title"><span class="lang-en">Run Coverage Audit</span><span class="lang-ar">&#1578;&#1588;&#1594;&#1610;&#1604; &#1578;&#1583;&#1602;&#1610;&#1602; &#1575;&#1604;&#1578;&#1594;&#1591;&#1610;&#1577;</span></div>
+      <div class="rec-detail"><span class="lang-en">The Apr 15 workspace reorganization may have created new sub-folders. Run the 3-check audit (lesson #363).</span><span class="lang-ar">&#1573;&#1593;&#1575;&#1583;&#1577; &#1578;&#1606;&#1592;&#1610;&#1605; &#1605;&#1587;&#1575;&#1581;&#1577; &#1575;&#1604;&#1593;&#1605;&#1604; &#1602;&#1583; &#1578;&#1603;&#1608;&#1606; &#1571;&#1606;&#1588;&#1571;&#1578; &#1605;&#1580;&#1604;&#1583;&#1575;&#1578; &#1580;&#1583;&#1610;&#1583;&#1577;.</span></div>
+      <div class="rec-priority"><span class="badge badge-warn">High</span></div>
+    </div>
+  </div>
+
+  <h3><span class="lang-en">Short-Term (This Week)</span><span class="lang-ar">&#1602;&#1589;&#1610;&#1585; &#1575;&#1604;&#1605;&#1583;&#1609; (&#1607;&#1584;&#1575; &#1575;&#1604;&#1571;&#1587;&#1576;&#1608;&#1593;)</span></h3>
+
+  <div class="rec-card">
+    <div class="rec-num">3</div>
+    <div class="rec-body">
+      <div class="rec-title"><span class="lang-en">Service Auto-Restart Watchdog</span><span class="lang-ar">&#1605;&#1585;&#1575;&#1602;&#1576; &#1573;&#1593;&#1575;&#1583;&#1577; &#1575;&#1604;&#1578;&#1588;&#1594;&#1610;&#1604; &#1575;&#1604;&#1578;&#1604;&#1602;&#1575;&#1574;&#1610;</span></div>
+      <div class="rec-detail"><span class="lang-en">Add a Windows Task Scheduler job or PowerShell watchdog that checks <code>curl http://127.0.0.1:21420/health</code> every 5 minutes and restarts <code>rag serve</code> on failure.</span><span class="lang-ar">&#1571;&#1590;&#1601; &#1605;&#1607;&#1605;&#1577; &#1605;&#1580;&#1583;&#1608;&#1604;&#1577; &#1604;&#1604;&#1578;&#1581;&#1602;&#1602; &#1605;&#1606; &#1575;&#1604;&#1589;&#1581;&#1577; &#1603;&#1604; 5 &#1583;&#1602;&#1575;&#1574;&#1602;.</span></div>
+      <div class="rec-priority"><span class="badge badge-warn">High</span></div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rec-num">4</div>
+    <div class="rec-body">
+      <div class="rec-title"><span class="lang-en">Monitor Qdrant Performance</span><span class="lang-ar">&#1605;&#1585;&#1575;&#1602;&#1576;&#1577; &#1571;&#1583;&#1575;&#1569; Qdrant</span></div>
+      <div class="rec-detail"><span class="lang-en">Track search latency with 27,604 points in local mode. If queries exceed 500ms, evaluate Docker deployment.</span><span class="lang-ar">&#1578;&#1578;&#1576;&#1593; &#1586;&#1605;&#1606; &#1575;&#1604;&#1575;&#1587;&#1578;&#1580;&#1575;&#1576;&#1577;. &#1573;&#1584;&#1575; &#1578;&#1580;&#1575;&#1608;&#1586; 500 &#1605;&#1604;&#1604;&#1610; &#1579;&#1575;&#1606;&#1610;&#1577;&#1548; &#1602;&#1610;&#1617;&#1605; &#1606;&#1588;&#1585; Docker.</span></div>
+      <div class="rec-priority"><span class="badge badge-info">Medium</span></div>
+    </div>
+  </div>
+
+  <h3><span class="lang-en">Medium-Term (This Month)</span><span class="lang-ar">&#1605;&#1578;&#1608;&#1587;&#1591; &#1575;&#1604;&#1605;&#1583;&#1609; (&#1607;&#1584;&#1575; &#1575;&#1604;&#1588;&#1607;&#1585;)</span></h3>
+
+  <div class="rec-card">
+    <div class="rec-num">5</div>
+    <div class="rec-body">
+      <div class="rec-title"><span class="lang-en">Weekly Full Re-Index</span><span class="lang-ar">&#1573;&#1593;&#1575;&#1583;&#1577; &#1601;&#1607;&#1585;&#1587;&#1577; &#1603;&#1575;&#1605;&#1604;&#1577; &#1571;&#1587;&#1576;&#1608;&#1593;&#1610;&#1577;</span></div>
+      <div class="rec-detail"><span class="lang-en">Schedule a weekly full re-index to catch drift between filesystem and index state.</span><span class="lang-ar">&#1580;&#1583;&#1608;&#1604;&#1577; &#1573;&#1593;&#1575;&#1583;&#1577; &#1601;&#1607;&#1585;&#1587;&#1577; &#1571;&#1587;&#1576;&#1608;&#1593;&#1610;&#1577; &#1604;&#1604;&#1578;&#1602;&#1575;&#1591; &#1575;&#1604;&#1575;&#1606;&#1581;&#1585;&#1575;&#1601;.</span></div>
+      <div class="rec-priority"><span class="badge badge-info">Medium</span></div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rec-num">6</div>
+    <div class="rec-body">
+      <div class="rec-title"><span class="lang-en">Index Size Governance</span><span class="lang-ar">&#1581;&#1608;&#1603;&#1605;&#1577; &#1581;&#1580;&#1605; &#1575;&#1604;&#1601;&#1607;&#1585;&#1587;</span></div>
+      <div class="rec-detail"><span class="lang-en">Establish a policy for archiving completed projects from config.toml and evaluating whether all 11 KhairGate HUB sub-entries are still needed.</span><span class="lang-ar">&#1608;&#1590;&#1593; &#1587;&#1610;&#1575;&#1587;&#1577; &#1604;&#1571;&#1585;&#1588;&#1601;&#1577; &#1575;&#1604;&#1605;&#1588;&#1575;&#1585;&#1610;&#1593; &#1575;&#1604;&#1605;&#1603;&#1578;&#1605;&#1604;&#1577;.</span></div>
+      <div class="rec-priority"><span class="badge badge-info">Medium</span></div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rec-num">7</div>
+    <div class="rec-body">
+      <div class="rec-title"><span class="lang-en">Usage Analytics</span><span class="lang-ar">&#1578;&#1581;&#1604;&#1610;&#1604;&#1575;&#1578; &#1575;&#1604;&#1575;&#1587;&#1578;&#1582;&#1583;&#1575;&#1605;</span></div>
+      <div class="rec-detail"><span class="lang-en">Enable the rag-plugin usage-log toggle (<code>/rag-config</code>) to track which projects are searched most/least, informing index pruning decisions.</span><span class="lang-ar">&#1578;&#1601;&#1593;&#1610;&#1604; &#1587;&#1580;&#1604; &#1575;&#1604;&#1575;&#1587;&#1578;&#1582;&#1583;&#1575;&#1605; &#1604;&#1578;&#1578;&#1576;&#1593; &#1571;&#1603;&#1579;&#1585; &#1575;&#1604;&#1605;&#1588;&#1575;&#1585;&#1610;&#1593; &#1576;&#1581;&#1579;&#1575;&#1611;.</span></div>
+      <div class="rec-priority"><span class="badge badge-neutral">Low</span></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+  <span class="lang-en">Ragtools Evaluation Report v1.0 | Generated 16 Apr 2026 | Mahmoud Elshahed, IT Project Manager</span>
+  <span class="lang-ar">&#1578;&#1602;&#1585;&#1610;&#1585; &#1578;&#1602;&#1610;&#1610;&#1605; Ragtools &#1573;&#1589;&#1583;&#1575;&#1585; 1.0 | 16 &#1571;&#1576;&#1585;&#1610;&#1604; 2026 | &#1605;&#1581;&#1605;&#1608;&#1583; &#1575;&#1604;&#1588;&#1575;&#1607;&#1583;</span>
+</div>
+
+<script>
+// === NAVIGATION ===
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+  document.querySelector('.sidebar a[data-section="' + id + '"]').classList.add('active');
+}
+
+// === LANGUAGE TOGGLE ===
+function toggleLang() {
+  const html = document.documentElement;
+  if (html.dir === 'ltr') {
+    html.dir = 'rtl';
+    html.lang = 'ar';
+  } else {
+    html.dir = 'ltr';
+    html.lang = 'en';
+  }
+  localStorage.setItem('ragtools-eval-lang', html.dir);
+}
+
+// Restore language preference
+(function() {
+  const saved = localStorage.getItem('ragtools-eval-lang');
+  if (saved === 'rtl') {
+    document.documentElement.dir = 'rtl';
+    document.documentElement.lang = 'ar';
+  }
+})();
+</script>
+
+</body>
+</html>
