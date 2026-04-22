@@ -134,6 +134,7 @@ Start at 100
 - Each WARNING finding (CR-09): -5 points
 - Each INFO finding (CR-10, CR-11): -2 points
 Minimum score: 0
+
 ```
 
 ## Output Format
@@ -172,6 +173,7 @@ Always return the review in this exact structure:
 ### Summary
 
 [1-2 sentence summary of overall drift pattern and the single highest-priority fix]
+
 ```
 
 ## Important Rules

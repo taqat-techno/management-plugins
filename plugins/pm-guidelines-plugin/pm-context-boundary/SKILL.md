@@ -84,6 +84,7 @@ Grep the deliverable for internal work-item patterns and flag every occurrence w
 \bTASK-\d+\b
 \b[A-Z]{2,5}-\d+\b        (project-prefix tickets, e.g., KG-234, BMS-1019)
 \b#\d{4,}\b               (raw ticket numbers, e.g., #1234)
+
 ```
 
 These are development-team shorthand. Clients don't know what WI-12458 refers to and shouldn't see it.
@@ -103,6 +104,7 @@ FROM WorkItems
 AssignedTo
 \bIterationPath\b
 \bAreaPath\b
+
 ```
 
 A Data Source tab containing "exact queries" (encouraged by `pm-dashboard-design` for internal transparency) becomes a liability when the dashboard is shared externally. The scrub catches this.
@@ -119,6 +121,7 @@ slack\.com/archives/
 localhost:\d+
 127\.0\.0\.1
 file:///
+
 ```
 
 Also inspect `href` attributes, not just visible text. Links labeled "read more" can hide Teams deep links.
@@ -194,6 +197,7 @@ When this skill activates, walk the procedure:
 
 ### Verdict
 <BOUNDARY CLEAR | ISSUES FOUND — N items>
+
 ```
 
 7. **If ISSUES FOUND, block delivery** until each item is resolved or explicitly acknowledged by the user ("This WI-ID is intentional — it's been approved for client visibility"). Record acknowledgments.

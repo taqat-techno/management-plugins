@@ -144,6 +144,7 @@ Attached: Q1 Progress Report
 - Budget utilization summary (82% of allocated)
 - Risk register with 3 open items
 - Next quarter timeline and milestones
+
 ```
 
 ## Rule 6: Two-Audience Report Pattern (Rule 133 from memory)
@@ -191,6 +192,7 @@ When assigning topics or email threads to project categories:
 ```
 BAD:  "Terms and Conditions (English)" → Relief Center (keyword match on "Terms")
 GOOD: Check participants (Dr. Bahaa, Hacene, Syed) → BMS/KhairGate (correct project)
+
 ```
 
 Always check the participant list before assigning. Keywords are ambiguous; people are not.
@@ -211,6 +213,7 @@ If a report has a recurring update workflow, document it inside the report itsel
     </ol>
     <p><strong>Schedule:</strong> Every Thursday before weekly meeting</p>
 </div>
+
 ```
 
 Anyone opening the report should understand how it gets updated without needing external documentation.
@@ -235,6 +238,7 @@ Cross-project reference checklist:
 [ ] Cross-project mentions prefixed with the project's name
 [ ] Portfolio/multi-project reports marked as such in the title and H1
 [ ] Before external delivery, pm-context-boundary skill invoked
+
 ```
 
 ## Quality Checklist (Run Before Finalizing)

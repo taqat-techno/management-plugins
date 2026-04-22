@@ -123,6 +123,7 @@ When working with repos that receive external updates:
    - Commits pulled: abc1234..def5678
    - Files changed: proposal_v2.html (+45), backlog.xlsx (+12)
    - Key changes: "v2 reduced duration from 9 to 4 months"
+
 ```
 
 ### Why This Matters
@@ -163,6 +164,7 @@ git log $OLD_HEAD..HEAD --oneline
 
 # THEN do the diff for content changes
 git diff --stat $OLD_HEAD..HEAD
+
 ```
 
 This was validated 14+ times in the Enhanced Standalone project. Without `git log OLD..NEW`, intermediate commits were repeatedly missed during fast-forward pulls.
@@ -205,6 +207,7 @@ End-of-session checklist:
 [ ] If any file moved this session: pm-link-integrity validation ran
 [ ] If any externally-sent deliverable: pm-context-boundary scrub ran
 [ ] Lessons captured — surprising failures AND confirmed-good choices both recorded
+
 ```
 
 Intentional WIP state must be recorded in the session log with the reason. Example:
@@ -217,13 +220,13 @@ Unrecorded WIP becomes next-session-Claude's confusion. Always annotate.
 
 When both an `.md` and a sibling `.html` with the same stem exist in a PM deliverable folder, the Markdown file is canonical. The HTML is the generated artifact. The source-of-truth direction is MD -> HTML, never the reverse.
 
-**Forbidden:**
+## Forbidden:
 
 - Editing the HTML directly to add content that isn't in the MD.
 - Updating a KPI row in the HTML and not the MD.
 - Regenerating HTML from MD without first reconciling drift.
 
-**Allowed:**
+## Allowed:
 
 - HTML-only concerns: CSS tweaks, JavaScript behaviour, embedded widgets, print-CSS, bilingual span pair wiring. These do not belong in the MD source.
 - Deleting the MD if it is demonstrably stale AND the HTML is now the intended source (document the switch in a commit message and in CLAUDE.md so a future author doesn't re-generate from the stale MD).

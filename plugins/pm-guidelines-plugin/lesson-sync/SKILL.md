@@ -128,6 +128,7 @@ Is the lesson a rule that can be detected by regex in file content?
     NO  → Does it require multi-file analysis?
       YES → Extend an existing Agent's checklist
       NO  → Add to pm-session-discipline skill (catch-all for workflow rules)
+
 ```
 
 ### Step 4: Route to Components
@@ -186,17 +187,21 @@ Produce a sync report:
 - [list of files modified]
 
 ### Coverage: N/N lessons (100%)
+
 ```
 
 ## Handling Edge Cases
 
 ### Duplicate Lesson Numbers
+
 `global_lessons.md` has duplicate numbers 28-35 (DevOps Integration and Session Workflow). The unique key for a lesson is `{category}:{number}`, NOT just the number.
 
 ### Lessons Without Clear Category Match
+
 If a lesson's category doesn't match any row in the routing table AND the decision tree doesn't clearly suggest a component type, flag it in the report as "Manual classification needed" rather than guessing wrong.
 
 ### Rapid Succession of Changes
+
 If multiple lessons are added at once across different categories, process them in category order (top to bottom in global_lessons.md) to maintain consistency.
 
 ## Sync Frequency

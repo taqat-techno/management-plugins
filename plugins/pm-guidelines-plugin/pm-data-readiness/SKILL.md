@@ -107,6 +107,7 @@ Open Work Items — KhairGate Wallet
   Probe: 2026-04-21 15:30 UTC (live MCP via wit_query_by_wiql)
   Result: 42 items
   Confidence: HIGH
+
 ```
 
 ### Rule DR-C: Freshness Budget
@@ -181,6 +182,7 @@ Data-Readiness Self-Check
 [ ] Probe results are traceable from the deliverable back to the authoring session
 [ ] For dashboards: Data Source tab populated per pm-dashboard-design Rule 30
 [ ] For estimates: the math shown derives from probe results, not memory
+
 ```
 
 ## When Not To Activate

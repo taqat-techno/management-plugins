@@ -89,6 +89,7 @@ Command template:
 ```bash
 grep -rEn '(href|src|data-link|data-href)=["'\''][^"'\'']*<target-filename>' .
 grep -rEn '\]\((\./|\.\./|/)[^)]*<target-filename>' .
+
 ```
 
 For a folder rename, repeat for every file under the folder.
@@ -104,6 +105,7 @@ Inbound links to <target>:
   README.md:23           — [Old report](./reports/old.html)
 
 Total: 3 references across 3 files. Proceed with move + rewrite? (yes / no / show more)
+
 ```
 
 If the catalogue is empty, confirm with the user before moving ("No inbound links found — proceed anyway?"). An empty catalogue is rare and usually means the grep missed a pattern.
@@ -129,6 +131,7 @@ for href in $(grep -oE 'href="[^"]+"' nav-regions.html); do
     path=$(echo "$href" | sed -E 's/href="(.*)"/\1/')
     [ -f "$path" ] || echo "MISSING: $path"
 done
+
 ```
 
 Nav menus are the public face of the document. A broken nav link is visible to every reader.
@@ -143,6 +146,7 @@ Validation failed:
   - 1 nav link target not found: sidebar.json:12 -> /reports/old.html
 
 Options: (1) fix the remaining references, (2) revert the move (git mv NEW OLD).
+
 ```
 
 ### Rule LI-06: Folder Rename = N File Moves
@@ -159,6 +163,7 @@ Files to move under researches/ -> research/:
   researches/analysis/b.html  (1 inbound)
 
 Total: 11 inbound references across 4 files. Proceed?
+
 ```
 
 ## Nine-Step Procedure

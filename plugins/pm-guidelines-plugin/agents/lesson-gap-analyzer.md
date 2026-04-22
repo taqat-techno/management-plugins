@@ -52,27 +52,36 @@ Read `global_lessons.md` from the repository root (`D:\Global Lessons\global_les
 Use Glob to find all plugin files, then read each:
 
 **Skills** (SKILL.md files):
+
 ```
 plugins/pm-guidelines-plugin/*/SKILL.md
+
 ```
+
 For each skill, extract:
 - Rule references (e.g., "Rule 19", "Guideline 5", "(Rules 49-52)")
 - Section headings that reference lesson content
 - Checklist items that enforce specific lessons
 
 **Hooks** (.py files):
+
 ```
 plugins/pm-guidelines-plugin/hooks/*.py
+
 ```
+
 For each hook, extract:
 - Docstring references to guidelines
 - Regex patterns that enforce specific rules
 - Comments referencing lesson numbers
 
 **Agents** (.md files):
+
 ```
 plugins/pm-guidelines-plugin/agents/*.md
+
 ```
+
 For each agent, extract:
 - Check IDs and their descriptions
 - Skills preloaded (inherit those skills' lesson coverage)
@@ -144,6 +153,7 @@ Always return your analysis in this exact structure:
 
 1. [Specific actionable recommendations for closing gaps]
 2. [Suggestions for rebalancing overloaded components]
+
 ```
 
 ## Important Rules

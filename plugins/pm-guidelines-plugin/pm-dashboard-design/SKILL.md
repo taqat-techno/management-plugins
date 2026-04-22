@@ -88,6 +88,7 @@ OKR scoring MUST be automatic. Never rely on manual status entry.
 ```html
 <input type="number" class="kr-current" data-target="85" data-direction="higher"
        onchange="updateProgress(this)" value="62">
+
 ```
 
 ```javascript
@@ -117,6 +118,7 @@ function getColorClass(progress) {
     if (progress >= 40) return 'bg-warning';
     return 'bg-danger';
 }
+
 ```
 
 ### Inverse Metrics (Rule 20)
@@ -153,6 +155,7 @@ AND [System.AssignedTo] CONTAINS 'Team Member'</pre>
     <p>Results: 22 items returned</p>
     <a href="https://dev.azure.com/org/project/_queries" target="_blank">Verify in DevOps</a>
 </div>
+
 ```
 
 ## Timestamps: Fetch Time, Not Live Clock (Rule 34)
@@ -166,6 +169,7 @@ setInterval(() => {
 // GOOD - shows when data was actually retrieved
 document.getElementById('fetch-time').textContent = fetchTimestamp;
 // Where fetchTimestamp was captured at the moment of API call
+
 ```
 
 ## Full Project Names (Rule 35)
@@ -196,6 +200,7 @@ Every clickable number must follow the same flow:
 
 ```
 Card number → Breakdown table → Work Items popup (with DevOps links) → Back button
+
 ```
 
 NEVER skip levels for some metric types while keeping them for others. If To Do has 3-level drill-down, Bugs must too. Inconsistency confuses users.
@@ -209,6 +214,7 @@ Modals with many items push the Close button off-screen. Always set:
     max-height: 85vh;
     overflow-y: auto;
 }
+
 ```
 
 The Close and Back buttons must ALWAYS be reachable without scrolling past content.
@@ -230,6 +236,7 @@ function calculateOverallHealth(schedule, quality, scope, blockerCount) {
 
     return overall;
 }
+
 ```
 
 Remove the manual Overall toggle entirely. Manual values drift from reality.
@@ -250,6 +257,7 @@ function migrateData() {
         localStorage.removeItem(oldKey);
     }
 }
+
 ```
 
 Without migration, users lose all entered data on version upgrades.
@@ -282,11 +290,12 @@ function load() {
     }
     return defaultState();
 }
+
 ```
 
 **One versioned key per dashboard.** Do not scatter unrelated keys across one file (e.g., `kg-action-progress` alongside `kg-adr-state` alongside `kg-filters`). Consolidate into one object under one versioned key. When the schema needs new fields, bump the version and write a migration function — never silently change the shape.
 
-**Anti-patterns to avoid:**
+## Anti-patterns to avoid:
 
 ```javascript
 // BAD — three unrelated keys, none versioned
@@ -299,6 +308,7 @@ localStorage.setItem('pm-dashboard', { progress, adr, filters });  // was just {
 
 // GOOD — one versioned key, one consolidated object, migration on version bump
 localStorage.setItem('pm-dashboard-v2', { progress, adr, filters });
+
 ```
 
 Rule 114-bis checklist:
@@ -308,6 +318,7 @@ Rule 114-bis checklist:
 [ ] Schema version in the key name (pm-dashboard-v2, not pm-dashboard)
 [ ] Migration function (fromV1, fromV2, ...) for every prior schema version
 [ ] Migration runs once on load, preserves user data, removes the old key
+
 ```
 
 ## Collapsible Sections for Board HTML (Rule 74)
@@ -324,6 +335,7 @@ Board members navigate 15+ sections. Use collapsible containers:
     <summary>Resolved Items (12)</summary>
     <!-- collapsed by default for resolved/closed items -->
 </details>
+
 ```
 
 **Rule:** Resolved/Closed sections should be collapsed by default (`<details>` without `open`). Focus attention on pending items.
@@ -344,6 +356,7 @@ showModal({
     summary: { pass: 14, fail: 3, warn: 2 },
     details: checkResults
 });
+
 ```
 
 Include a summary bar (pass/fail counts) at the top of every modal.
@@ -364,6 +377,7 @@ function toggleGAR(el, value) {
         saveStatus(el, value);
     }
 }
+
 ```
 
 Without deselect, once you set a value you can never clear it.

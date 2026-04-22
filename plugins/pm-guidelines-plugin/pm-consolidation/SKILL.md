@@ -87,6 +87,7 @@ project/
 │   ├── gaps/
 │   └── recommendations/
 └── .pm-protected-paths    # Protects S1/, S2/ from edits
+
 ```
 
 ## Rule 40: Track Conflicts with Numbered IDs
@@ -112,6 +113,7 @@ Number every conflict for traceability:
         <p><strong>Impact:</strong> Migration effort estimate varies by ~11%</p>
     </div>
 </div>
+
 ```
 
 ### Conflict Registry Table
@@ -142,6 +144,7 @@ Every data point must be traceable to its origin:
 .source-s2 { border-left: 4px solid #fd7e14; background: #fff3e0; padding: 8px 12px; }
 .source-merged { border-left: 4px solid #6f42c1; background: #f3e8ff; padding: 8px 12px; }
 .source-new { border-left: 4px solid #198754; background: #e8f5e9; padding: 8px 12px; }
+
 ```
 
 Readers can trace ANY claim to its origin by color alone.
@@ -168,6 +171,7 @@ Classify every gap found during consolidation:
     <p><strong>Impact:</strong> Compliance requirement — cannot deploy without DR plan</p>
     <p><strong>Recommendation:</strong> Commission DR assessment before Phase 2</p>
 </div>
+
 ```
 
 ### Why 3 Tiers?
@@ -179,7 +183,7 @@ Simple enough to prevent analysis paralysis. More than 3 tiers (Critical/High/Me
 
 ## Rule 48: Recommendations Stay as Recommendations
 
-**NEVER auto-apply analysis recommendations to source files.**
+## NEVER auto-apply analysis recommendations to source files.
 
 The workflow is:
 1. Technical teams **provide analysis** (findings, gaps, conflicts)
@@ -200,6 +204,7 @@ You are step 2. You present. You do not decide or apply.
     <p><strong>Effort:</strong> 2 person-days to recount using standardized methodology</p>
     <span class="badge bg-info">Awaiting Governance Approval</span>
 </div>
+
 ```
 
 ## Consolidation Checklist

@@ -85,6 +85,7 @@ standalone/
 ├── v10/    # Frozen
 ├── v11/    # Frozen
 ├── v12/    # Current — new folder after latest pull
+
 ```
 
 Copy folder, increment version, apply fixes.
@@ -116,6 +117,7 @@ Six-element checklist:
     (not a stale hash copied from a prior standalone folder)
 [ ] Document Control table — last row's version = header version;
     last row's date = today; last row's Data Source = current commit hash
+
 ```
 
 Run this audit every time a version is bumped, whether manually or via the auto-updater. If the auto-updater missed any of the six elements, fix by hand and file the gap against Rule 75 (automation threshold).
@@ -172,6 +174,7 @@ Budget, Timeline, and Hiring show full 22-month program, but kickoff is Phase 0 
     <h3>Full Program (22 months)</h3>
     <!-- Complete program overview -->
 </div>
+
 ```
 
 ## BA Review Loop (Rule 61)
@@ -182,6 +185,7 @@ BA Review is a **loop**, not one-shot:
 Pass 1: Mahmoud reviews → finds issues
 Pass 2: Mohamed fixes → Mahmoud re-verifies
 Pass 3: (if needed) → loop until no critical issues
+
 ```
 
 Track pass number in Document Control or review notes. Document what was found and what was fixed in each pass.
@@ -211,6 +215,7 @@ All files using status buttons must share the **same** localStorage key (e.g., `
 const STATE_KEY = 'kg-action-progress';
 // ADR buttons: 3 states — "Pending Review" / "Accepted" / "Rejected"
 // Must match exactly across all files
+
 ```
 
 ### Collapsed Resolved Sections (Rule 66)
@@ -229,6 +234,7 @@ Use `<details>` **without** `open` attribute for ALL RESOLVED / CLOSED sections.
     <summary>Resolved Items (12)</summary>
     ...
 </details>
+
 ```
 
 ## PowerShell Safety (Rules 72-73)
@@ -252,6 +258,7 @@ Always use ASCII alternatives.
 @echo off
 powershell -ExecutionPolicy Bypass -NoExit -File "%~dp0script.ps1"
 pause
+
 ```
 
 `-NoExit` keeps the window open so errors stay visible.

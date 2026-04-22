@@ -150,6 +150,7 @@ Start at 100
 - Each WARNING finding: -5 points
 - Each INFO finding: -2 points
 Minimum score: 0
+
 ```
 
 The verdict label is determined by the SCORE *and* the mtime analysis:
@@ -191,6 +192,7 @@ The verdict label is determined by the SCORE *and* the mtime analysis:
 ### Summary
 
 [1-2 sentence summary of the divergence pattern and the single highest-priority action]
+
 ```
 
 ## Important Rules

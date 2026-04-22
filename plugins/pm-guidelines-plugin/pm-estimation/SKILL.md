@@ -113,6 +113,7 @@ If a backlog uses SP without defining what each value means, **derive the scale 
 
 ```
 Effective PM = Allocation % × Duration (months)
+
 ```
 
 ### Example Calculation (Show the Math)
@@ -133,6 +134,7 @@ A team of 6 at mixed allocations delivers **15.40 person-months** in 4 calendar 
 
 ```
 Allocation % × Duration = Person-Months
+
 ```
 
 For EACH member. Stakeholders trust calculations they can verify.
@@ -219,6 +221,7 @@ If a claim like "~40 open items" or "budget utilization around 62%" appears in a
 [ ] Probe failure downgrades confidence to LOW explicitly
 [ ] Stale probes (>7 days for active data) re-run before use
 [ ] Data Source tab of any deliverable lists the exact probe query and result
+
 ```
 
 ### Why Skill, Not Hook

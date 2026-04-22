@@ -100,6 +100,7 @@ Create a `.pm-protected-paths` file in your project root to block edits to sourc
 **/S1/*
 **/S2/*
 **/source-analysis/*
+
 ```
 
 The `source_file_protection` hook reads this file and blocks any Write/Edit to matching paths. If no config file exists, the hook is a no-op.
@@ -181,6 +182,7 @@ pm-guidelines-plugin/
     ├── test_pat_token_guard.py
     ├── test_post_write_dispatcher.py
     └── fixtures/
+
 ```
 
 > **Note:** 7 legacy hook files (`status_label_enforcer.py`, `bilingual_parity_check.py`, etc.) remain in `hooks/` as reference but are not registered in hooks.json. Their logic is consolidated into `post_write_dispatcher.py`.
@@ -241,6 +243,7 @@ Validate plugin integrity with a single command:
 
 ```bash
 py hooks/health_check.py
+
 ```
 
 Checks: hooks.json file references, agent skill references, orphaned files, lesson count vs plugin.json, skill directories, plugin metadata, model declarations.
@@ -253,6 +256,7 @@ Checks: hooks.json file references, agent skill references, orphaned files, less
 
 ```bash
 py -m pytest tests/ -v
+
 ```
 
 | Test File | Tests | Coverage |

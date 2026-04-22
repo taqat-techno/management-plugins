@@ -97,6 +97,7 @@ function renderTeamPulseTab() {
     document.querySelector('#pulse-open').textContent = data.openItems;
     // same source
 }
+
 ```
 
 ```html
@@ -104,6 +105,7 @@ function renderTeamPulseTab() {
 <div class="exec-kpi"><strong>42</strong> open items</div>
 ...
 <div class="pulse-header">38 open items</div>  <!-- this will rot -->
+
 ```
 
 When data comes from an API, still funnel it through ONE promise chain into ONE in-memory object consumed by all tabs:
@@ -118,6 +120,7 @@ async function loadDashboard() {
     const data = aggregate(workItems, budget, team);
     renderAllTabs(data);  // not renderTab1(data1), renderTab2(data2)
 }
+
 ```
 
 ### Rule CT-02: Summary Equals Sum of Details
@@ -132,6 +135,7 @@ Project open items (Exec)  = 42
   Unassigned                = 7
                               ---
                               42  ✓
+
 ```
 
 Legitimate filter differences between tabs must be annotated in the HTML so the next author knows the mismatch is intentional:
@@ -141,6 +145,7 @@ Legitimate filter differences between tabs must be annotated in the HTML so the 
     <!-- NOTE: exec summary excludes 'Blocked' items; detail tab includes all -->
     <strong>38</strong> active open items
 </div>
+
 ```
 
 Unannotated mismatches are bugs.
@@ -157,6 +162,7 @@ function renderHeader() {
     document.querySelector('.hero-completion').textContent =
         Math.round((data.milestonesComplete / data.milestonesTotal) * 100) + '%';
 }
+
 ```
 
 If the header banner shows a KPI the detail tabs never reproduce (e.g., a single synthetic health score), that's acceptable — just ensure it's computed from `data`, not a literal.
@@ -175,11 +181,13 @@ const teamMembers = [
 
 document.querySelector('.team-size').textContent =
     teamMembers.length + ' members';
+
 ```
 
 ```html
 <!-- WRONG — rotted the moment someone is added -->
 <div class="team-size">5 members</div>
+
 ```
 
 Same rule for counts of work items, projects, and any other collection visible on the dashboard.
@@ -222,6 +230,7 @@ Cross-Tab Reconciliation Self-Check
 [ ] Same label used for same concept across all tabs (CT-05)
 [ ] If the dashboard already existed before this session, suggest running the
     pm-cross-tab-reconciler agent for a semantic post-authoring audit
+
 ```
 
 If any box fails, explain the specific mismatch with tab names and suggest the fix before closing the turn.

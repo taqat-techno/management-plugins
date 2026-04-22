@@ -77,6 +77,7 @@ Every PM dashboard and deliverable intended for bilingual audiences MUST have `d
     <span class="lang-en" data-i18n="intro">This report covers Q1 2026 progress.</span>
     <span class="lang-ar" data-i18n="intro">يغطي هذا التقرير تقدم الربع الأول 2026.</span>
 </p>
+
 ```
 
 ### Language Toggle Implementation
@@ -111,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.lang-ar').forEach(el => el.style.display = 'none');
 });
 </script>
+
 ```
 
 ## Rule 8: Always Update Both Languages
@@ -148,6 +150,7 @@ Arabic layout can break:
     text-align: start;
     border-inline-start: 3px solid #007bff;
 }
+
 ```
 
 ### Separate RTL File
@@ -162,6 +165,7 @@ Always create a dedicated `rtl.css` file:
 [dir="rtl"] .float-left { float: right; }
 [dir="rtl"] .me-3 { margin-right: 0 !important; margin-left: 1rem !important; }
 [dir="rtl"] .ms-3 { margin-left: 0 !important; margin-right: 1rem !important; }
+
 ```
 
 ## Rule 10: Check Both Languages After Toggle
@@ -205,18 +209,21 @@ After any change:
         </tr>
     </tbody>
 </table>
+
 ```
 
 ## Rule 120: Batch i18n — Attributes + Dictionary in One Commit
 
 Adding `data-i18n` attributes to HTML without updating the JS translation dictionary causes keys to display as raw strings (e.g., the user sees `page-title` instead of the translated text).
 
-**Two patterns exist — both require atomic updates:**
+## Two patterns exist — both require atomic updates:
 
 ### Pattern A: Inline Paired Spans (simple pages)
+
 Each text element has `lang-en` and `lang-ar` spans. Adding a new text element means adding BOTH spans.
 
 ### Pattern B: JS Dictionary (complex dashboards, 200+ keys)
+
 A central JS object holds all translations:
 
 ```javascript
@@ -233,6 +240,7 @@ function toggleLang() {
         el.textContent = T[key][currentLang];
     });
 }
+
 ```
 
 **Rule:** When using Pattern B, every commit that adds `data-i18n` attributes to HTML files MUST also add the corresponding entries to the dictionary. For Hub V2: 9 HTML files + i18n.js = one atomic commit.

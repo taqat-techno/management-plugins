@@ -131,6 +131,7 @@ Start at 100
 - Each WARNING finding: -5 points
 - Each INFO finding: -2 points
 Minimum score: 0
+
 ```
 
 ## Output Format
@@ -165,6 +166,7 @@ Minimum score: 0
 ### Recommended Action
 
 [Summary linking highest-leverage fix: typically restoring a single missing target file resolves N findings at once. If the root cause is an unmanaged move, recommend running the pm-link-integrity skill retroactively to catalogue and fix.]
+
 ```
 
 ## Important Rules

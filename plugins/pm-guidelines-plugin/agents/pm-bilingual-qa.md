@@ -182,6 +182,7 @@ Always return your QA report in this exact structure:
 ### Recommended Fixes
 
 [Numbered list of concrete fixes for each issue]
+
 ```
 
 ## Important Rules

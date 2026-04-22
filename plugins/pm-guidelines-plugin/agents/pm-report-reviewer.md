@@ -132,6 +132,7 @@ Start at 100
 - Each WARNING violation: -5 points
 - Each INFO violation: -2 points
 Minimum score: 0
+
 ```
 
 ### Score Caps
@@ -201,6 +202,7 @@ Always return your review in this exact structure:
 ### Summary
 
 [1-2 sentence summary of overall quality and most important action items]
+
 ```
 
 ## Important Rules

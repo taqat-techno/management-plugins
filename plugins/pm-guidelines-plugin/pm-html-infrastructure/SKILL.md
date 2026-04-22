@@ -64,6 +64,7 @@ static/css/
 ├── components.css      # Cards, tables, badges, progress bars
 ├── rtl.css             # Arabic/RTL overrides
 └── print.css           # Print-specific styles
+
 ```
 
 This allows targeted changes without breaking unrelated pages.
@@ -81,6 +82,7 @@ scripts/
 ├── 05_generate_charts.py      # Build chart data
 ├── 06_build_dashboard.py      # Assemble HTML
 └── run_all.sh                 # Execute 01-06 in sequence
+
 ```
 
 ### JSON Intermediates
@@ -95,6 +97,7 @@ data/
 ├── metrics.json               # Output of 04
 ├── charts.json                # Output of 05
 └── dashboard.html             # Output of 06
+
 ```
 
 Large JSON intermediates (even 20MB) are worth the storage cost — they decouple pipeline stages so any downstream script can run independently.
@@ -110,6 +113,7 @@ For projects exceeding 10 subfolders, create `FOLDER_OBJECTIVE_MAP.html`:
     <tr><td>data/</td><td>JSON intermediates</td><td>metrics.json</td></tr>
     <tr><td>templates/</td><td>HTML templates</td><td>dashboard_base.html</td></tr>
 </table>
+
 ```
 
 New team members can orient themselves immediately.
@@ -125,6 +129,7 @@ Dashboard print output breaks mid-card without these rules:
     .tab-content { display: block !important; } /* Show all tabs */
     .tab-content + .tab-content { break-before: always; }
 }
+
 ```
 
 Always test `Ctrl+P` after adding print styles. Hidden tabs produce blank pages.
@@ -152,6 +157,7 @@ document.querySelector('canvas').style.display = 'block';
 // GOOD: use Chart.js API
 myChart.data.datasets[0].data = newData;
 myChart.update(); // Required - re-renders the canvas
+
 ```
 
 Canvas-based charts are not DOM elements. Always use the chart library's API for updates.

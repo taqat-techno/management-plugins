@@ -56,6 +56,7 @@ Dashboard metrics must match the exact states in Azure DevOps. Always query actu
 
 ```
 GET /_apis/wit/workitemtypes/{type}/states
+
 ```
 
 Real states: `To Do`, `In Progress`, `Resolved`, `Done`, `Closed`
@@ -68,6 +69,7 @@ When Area Paths don't exist for team breakdown:
 
 ```sql
 [System.AssignedTo] CONTAINS 'member name'
+
 ```
 
 This works cross-project and is more flexible than area paths.
@@ -78,6 +80,7 @@ Never hardcode project names. Always discover first:
 
 ```
 GET /_apis/projects?api-version=7.0
+
 ```
 
 Then let the user confirm which projects to include.
@@ -97,6 +100,7 @@ Never mix work item types in a single query:
 [System.WorkItemType] = 'Bug'
 -- Query 3: Enhancements only
 [System.WorkItemType] = 'Enhancement'
+
 ```
 
 Each type needs its own KPI card, WIQL query, and column in drill-down tables. Without separation, you can't answer "how many bugs are open?" from the dashboard.
@@ -111,6 +115,7 @@ Azure DevOps has a dedicated blocked field:
 
 -- BAD: requires manual tagging, easily forgotten
 [System.Tags] CONTAINS 'Blocked'
+
 ```
 
 The `Blocked` field is built into the work item form. Tags require discipline that teams rarely maintain.
@@ -133,6 +138,7 @@ Convention: one `roster.json` (or `.team-roster.yml`) in the project root:
     { "name": "Afthab P A", "email": "afthab@taqat.qa", "role": "QC Engineer", "dedicated_to": "KhairGate Wallet" }
   ]
 }
+
 ```
 
 Every dashboard, RACI table, and WIQL query consumes this file or imports from it. Hand-typing names into HTML is banned.
@@ -157,6 +163,7 @@ const assignedToClause = roster.members
     .join(', ');
 const wiql = `SELECT [System.Id] FROM WorkItems
               WHERE [System.AssignedTo] IN (${assignedToClause})`;
+
 ```
 
 Canonical roster checklist:
@@ -167,6 +174,7 @@ Canonical roster checklist:
 [ ] WIQL IN-clauses are generated from roster.members[*].email
 [ ] Adding or removing a team member = one edit (roster.json), never N edits across files
 [ ] Roster file path documented in the dashboard's Data Source tab
+
 ```
 
 ## Live-API Probe Recipe — Data Readiness Gate (Rule DR-1)
@@ -189,6 +197,7 @@ az boards query --wiql \
 
 # What states does this work item type actually have?
 az boards work-item type show --type Task --project "<project>"
+
 ```
 
 Rule: if the probe fails (timeout, auth error, empty org) OR returns fewer than expected results, downgrade claim confidence to LOW and state the assumption explicitly in the deliverable. Never report "~40 open items" when the probe timed out — say "probe failed; estimate withheld".
