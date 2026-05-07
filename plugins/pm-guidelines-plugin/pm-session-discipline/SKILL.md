@@ -190,6 +190,20 @@ PowerShell's `-replace` operator and `[regex]::Replace()` silently mangle HTML a
 
 This caused data corruption in multiple report build sessions.
 
+## Rule 38-bis: Reflog-Aware Mid-Session Verification
+
+Companion to Rule 38 (pre-analysis pull). Rule 38 closes the window at session start; Rule 38-bis closes it during long-running multi-step edits.
+
+When working on a long-lived edit pass over a shared file (especially `global_lessons.md`):
+
+1. **Snapshot HEAD at start:** `git rev-parse HEAD` — remember the SHA.
+2. **Mid-pass surprise → reflog first:** If counts/content don't match expectation, run `git reflog -10` BEFORE assuming local error.
+3. **Look for unauthored commits:** Any HEAD movement you didn't make = parallel session.
+4. **Don't revert blindly:** If the parallel commit bundled your work in (clean working tree despite ongoing edits), the work is preserved — just continue from current HEAD.
+5. **Smaller commits = smaller window:** For shared files (`global_lessons.md` especially), prefer frequent small commits over one large commit at end of pass.
+
+See: lesson #742, #306 (always pull first), #36-#39 (Session Workflow basics).
+
 ## Rule 36-bis: Session-End Repo Discipline
 
 The Stop hook (`session_end_lessons.py`) reminds you to capture lessons. It does NOT check that your repos are clean and pushed — that's this rule's job.

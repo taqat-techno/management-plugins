@@ -75,7 +75,7 @@ This is the master routing table. Every lesson category maps to specific plugin 
 | Search Index Maintenance | 22-23 | — | search_index_rebuild | — |
 | Project Estimation & Story Points | 24-27 | pm-estimation | — | — |
 | DevOps API Integration | 28-35 | pm-devops-integration | pat_token_guard | — |
-| Session Workflow & Git Hygiene | 36-39 | pm-session-discipline | git_pull_before_analysis | — |
+| Session Workflow & Git Hygiene | 36-39, 742 | pm-session-discipline (Rule 38-bis covers #742) | git_pull_before_analysis | — |
 | Data Analysis & Presentation | 40-43 | pm-estimation | — | — |
 | Memory & Lessons Discipline | 44-46 | pm-session-discipline | session_end_lessons | — |
 | Consolidation & Multi-Source Architecture | 47-50 | pm-consolidation | source_file_protection | — |
