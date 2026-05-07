@@ -92,6 +92,19 @@ This is the master routing table. Every lesson category maps to specific plugin 
 | OKR & KPI Dashboard v3 | 121-133 | pm-dashboard-design | post_write_dispatcher | pm-report-reviewer |
 | Email Analysis & Weekly Reporting | 134-137 | pm-report-writing | — | pm-report-reviewer |
 
+## Operational tooling for `global_lessons.md` itself (v1.8.0)
+
+These components don't map to specific lesson categories — they operate on the file as a whole:
+
+| Component | Type | Purpose |
+|---|---|---|
+| `/pm-guidelines:PM-lessons-audit` | Slash command | Read-only structural audit (collisions, single-cats, empty-cats, out-of-order date blocks) using deterministic shell primitives |
+| `pm-lessons-content-duplicates` | Agent | Semantic-duplicate detector (same-topic lessons under different numbers) — companion to lesson-gap-analyzer |
+| `/pm-guidelines:PM-lessons-refine` | Slash command | Orchestrator for the 7-step refinement pass: pre-flight + audit + decision sheet + renumber + merges + verify + PR |
+| `lesson-gap-analyzer` | Agent | Plugin-coverage audit — which lessons are enforced by which component (post-PR #1 deterministic primitives) |
+
+When a lesson is OPERATIONAL (about how to maintain `global_lessons.md` itself, like #742 reflog-aware verification), route it to `pm-session-discipline` per the existing Session Workflow row, not to one of these new components.
+
 ## Sync Procedure
 
 ### Step 1: Parse Source File
