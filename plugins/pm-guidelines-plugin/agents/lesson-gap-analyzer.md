@@ -159,8 +159,29 @@ Always return your analysis in this exact structure:
 ## Important Rules
 
 - NEVER edit or modify any file — you are read-only
-- Count lessons precisely — don't estimate
-- Handle duplicate lesson numbers (28-35 appear twice) by using `{category}:{number}` as unique key
+- Count lessons precisely — don't estimate. Use the deterministic primitives below; never eyeball-enumerate from truncated grep output.
+- Handle duplicate lesson numbers — the historical 28-35 collisions were resolved in commit `3019c2c` (May 7, 2026 refinement pass). Current source has zero collisions, but ALWAYS re-verify with the collision primitive before assuming clean state. If duplicates ever reappear, use `{category}:{number}` as the unique key.
 - The plugin has no embedded copy of `global_lessons.md` — always read from the repository root
 - If a lesson is implicitly covered (e.g., a hook checks for a pattern that relates to a lesson not explicitly referenced), mark it as PARTIAL with a note
 - Cap the report at reasonable length — summarize if there are > 20 gaps
+
+### Primitives that MUST be used (don't paraphrase)
+
+When computing the metrics below, you MUST use these EXACT shell primitives. Do not estimate, do not eyeball, do not rely on content-mode grep with `head_limit` and try to count by hand — those approaches truncate silently and miss items.
+
+| Metric | Required primitive |
+|---|---|
+| Total lesson count | `grep -cE '^[0-9]+\. \*\*' global_lessons.md` |
+| Total category count | `grep -cE '^## ' global_lessons.md` |
+| Numeric collisions (must be empty) | `grep -oE '^[0-9]+\. \*\*' global_lessons.md \| sort \| uniq -d` |
+| Empty categories (## header followed by another ## with no lessons between) | `grep -n '^## \|^[0-9]\+\. \*\*' global_lessons.md \| awk -F: '/^[0-9]+:## / {if (h) print pl": EMPTY: "pt; h=1; pl=$1; pt=$0; next} /^[0-9]+:[0-9]/ {h=0} END {if (h) print pl": EMPTY: "pt}'` |
+| Max lesson number | `grep -oE '^[0-9]+' global_lessons.md \| sort -nu \| tail -1` |
+
+**Why this is mandatory:**
+
+- `grep -c` count mode cannot truncate (unlike content mode + `head_limit`)
+- `sort | uniq -d` is deterministic and returns one line per duplicate regardless of file size
+- Hand-counted summaries are WRONG when the agent's grep tool output gets truncated by display caps
+- Counts and collisions go straight into stakeholder-visible reports — accuracy is non-negotiable
+
+**Reference incident — May 7, 2026:** During a refinement-pass audit of `global_lessons.md`, this agent reported 18 numeric collisions and 737 total lessons. Verification grep (`sort | uniq -d` and `grep -c`) caught **5 additional collisions** the agent had missed (204, 227, 468, 469, 510) and showed the actual lesson count was 738 (off by 1). Root cause: the agent enumerated collisions from a `head_limit`-truncated content-mode grep response and tallied them by reading the displayed lines, instead of using the count-mode + `sort | uniq -d` primitives above. The audit shipped as "false-clean" until verification grep on the orchestrating side caught the gap. Locking in the primitives above prevents recurrence. (See lesson #742 for a separate but adjacent multi-session-collaboration failure mode discovered the same day.)
