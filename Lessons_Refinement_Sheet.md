@@ -22,6 +22,28 @@ A separate mechanical pass (Section A renumber) is applied **immediately after t
 
 ---
 
+## APPLIED — 2026-05-07 (post-decision execution log)
+
+User's decision: **"go with all"** — accept every proposed action across Sections A/B/C/D.
+
+| Section | Status | Notes |
+|---|---|---|
+| **A** — 23 numeric collisions | ✅ Applied | Commit `3019c2c` (renumber + sheet checkpoint) |
+| **B** — 5 deletes + 4 cross-refs + 3 augmentations + 1 relocation + B13 reconciliation | ✅ Applied | Commit `c884731` (parallel-session commit that bundled my Section B work + their new lesson #741 — they renumbered #741 to avoid colliding with my newly-assigned #718) |
+| **C** — Mar 31 HR block move | ✅ Applied | This commit (Section C/D batch) |
+| **D** — 7 of 8 single-lesson absorptions | ✅ Applied | This commit. Dropped 1: "Workspace Reorganization & Session Hooks (Apr 15)" grew to 2 lessons after parallel commits — no longer single-lesson. |
+
+**Final state of `global_lessons.md`:**
+- Lessons: 734 (was 738 before pass; 5 deletes + 1 parallel add = -4)
+- Categories: 113 (was 121 before pass; 8 removed: 7 absorptions + 1 empty Version Archive header from B5 delete)
+- Numeric collisions: 0
+- Empty categories: 0
+- Max lesson number: 741
+
+**Surprise during execution:** A parallel session committed `c884731` while I was applying Section B. That commit pre-bundled all my uncommitted Section B work (deletes, augmentations, cross-refs, relocation, empty-cat cleanup) AND added their new lesson #741, renumbering it from their initial #718 (which would have collided with my new renumber). Took 30s to reconcile via `git reflog`. No data was lost; my Section B work landed in their commit cleanly.
+
+---
+
 ## Section A — 23 Numeric Collisions (MECHANICAL — pre-accepted)
 
 > **Note (post-apply):** The audit agent originally flagged 18 collisions. During verification, 5 more collisions surfaced that the agent had missed (numbers 204, 227, 468, 469, 510 — see end of Section A). All 23 are now resolved in the file. Audit agent coverage was incomplete; the verification grep was the safety net.
