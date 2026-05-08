@@ -1,7 +1,7 @@
 {
   "name": "pm-guidelines",
-  "version": "1.7.0",
-  "description": "Cross-project PM best practices enforcement — 504 guidelines, 14 skills, 6 agents, 8 hooks (7 quality checks in single dispatcher). Covers status labels, bilingual parity, dashboard quality, cross-tab reconciliation, link integrity, context-boundary scrub, MD/HTML parity, data-readiness gate, DevOps integration, HTML infrastructure, modal accessibility, print CSS, title consistency, session discipline, estimation, consolidation, and standalone updates. v1.7.0 adds the pm-data-readiness skill (probe-before-publish workflow for live data claims) and the pm-link-auditor agent (post-hoc hyperlink integrity audit — companion to the pm-link-integrity skill).",
+  "version": "1.8.0",
+  "description": "Cross-project PM best practices enforcement — 691 guidelines, 16 skills, 7 agents, 9 hooks (7 quality checks in single dispatcher + 2 PreToolUse guards). v1.8.0 adds Tier 1 operationalization of lessons #746-#776: frozen-artifact guard (extends source_file_protection with .pm-frozen-paths config — blocks edits to FROZEN HTML files like PMO Dashboard v10/v11/v12/v13/v14 + STP v3-v8); electron_renderer_check PreToolUse hook (blocks window.prompt/alert/confirm + renderer-side localhost fetch in Electron renderer files; warns on new ipcMain.handle); pm-multi-version-clone skill (3-rule v[N-1]→v[N] HTML clone hygiene); pm-cross-dashboard-drift agent (audits stale jump-list hrefs + localhost port drift + new Date(+'Z') NaN traps); pm-coverage-matrix skill (3-rule discipline: matrix-before-create, AskUserQuestion-options, delete-with-migration). Earlier versions: v1.7.0 added pm-data-readiness skill + pm-link-auditor agent.",
   "author": {
     "name": "TaqaTechno",
     "email": "info@taqatechno.com",
