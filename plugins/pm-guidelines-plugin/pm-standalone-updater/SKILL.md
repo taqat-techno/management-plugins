@@ -321,3 +321,20 @@ Before delivering any standalone update or auto-updater script:
 - [ ] Navigation organized by page type (Action/Reference/Audit)
 - [ ] No duplicate pages covering same topic
 - [ ] If any files moved between standalone versions, pm-link-integrity validation ran
+
+
+---
+
+## v1.8.0 Lesson Absorption
+
+### Lesson #771 — Multi-version HTML clone hygiene
+
+Companion skill: `pm-multi-version-clone` handles the **content-domain cleanup** that pm-standalone-updater's mechanical version-bump cannot do.
+
+**Workflow:** run pm-standalone-updater FIRST (handles tags+dates+PS1 auto-updater scripts). Then run pm-multi-version-clone for:
+
+- Rule (a): post-clone grep audit for past-version chatter (V10 SSOT, FULLY READY, 9/9 RESOLVED, comparison column headers, footer text)
+- Rule (b): wire new file into cross-ref nav across ALL sibling files in same step (orphan files are unreachable)
+- Rule (c): reframe stale predecessor badges to HISTORICAL/Superseded + neutral grey styling when adding (LATEST) successor cards
+
+Reference: `D:\Global Lessons\global_lessons.md` lesson #771.

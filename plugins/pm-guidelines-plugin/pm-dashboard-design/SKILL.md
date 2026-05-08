@@ -410,3 +410,18 @@ Before delivering any dashboard:
 - [ ] Collapsible sections for board HTML; resolved items collapsed by default
 - [ ] Audit/validation results shown in modal popup, not inline div
 - [ ] localStorage migration logic handles version key changes
+
+
+---
+
+## v1.8.0 Lesson Absorption
+
+### Lesson #769 — Cross-dashboard integration drift
+
+Three silent-failure classes that only surface when a stakeholder clicks the affected control. **Run the `pm-cross-dashboard-drift` agent** after any sibling-version-bump or roadmap pull-forward:
+
+- **(a) Stale `_v{N}.html` jump-list hrefs** vs latest version on disk. Cheapest defense: maintain `links_manifest.json` + `check-link-drift.ps1` that Globs each card folder.
+- **(b) Hardcoded `localhost:<PORT>` drift** vs CLAUDE.md ports registry. Use distinct named constants (`API`, `PM_API`, `CACHE_SERVER`) when a dashboard has multiple integrations. Add to port registry FIRST, then write the integration. When deprecating a service or migrating ports, grep + update ALL references same session.
+- **(c) `new Date(value + 'Z')` NaN trap** when upstream emits `+00:00` (PowerShell `ToString('o')` does). Defensive guard: `var ms = new Date(value).getTime(); if (isNaN(ms)) { /* fallback */ }`.
+
+Reference: `D:\Global Lessons\global_lessons.md` lesson #769. Companion: `pm-cross-dashboard-drift` agent (post-hoc audit).
