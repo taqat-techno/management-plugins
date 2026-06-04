@@ -1,0 +1,8 @@
+# Visual Studio / IDE cache
+.vs/
+
+# Local Claude Code config & session artifacts
+.claude/
+
+# Local archive (not a tracked deliverable)
+claude.rar
