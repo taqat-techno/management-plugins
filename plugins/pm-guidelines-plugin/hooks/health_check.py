@@ -9,6 +9,7 @@ Checks:
 5. All skill directories have SKILL.md
 6. plugin.json is valid JSON with required fields
 7. Every SKILL.md has a model: declaration
+8. Lesson metric vector report (distinct/entries/max_index+1/duplication_delta/retirement_gap) — never a scalar
 
 Usage: py hooks/health_check.py
 """
@@ -121,6 +122,26 @@ def check_orphaned_hooks(plugin_root):
     return 'PASS', 'No orphaned hook files'
 
 
+def _compute_lesson_metrics(content):
+    """Canonical lesson metric vector — see sem/COUNTING.md.
+
+    The single source of lesson-counting logic. Returns the five-value vector
+    derived from the entry rule `^N. **`; never collapses to a scalar.
+    """
+    nums = [int(n) for n in re.findall(r'^(\d+)\.\s+\*\*', content, re.MULTILINE)]
+    entries = len(nums)
+    distinct = len(set(nums))
+    max_index = max(nums) if nums else 0
+    return {
+        'entries': entries,
+        'distinct': distinct,
+        'max_index': max_index,
+        'max_index_plus_one': max_index + 1,
+        'duplication_delta': entries - distinct,
+        'retirement_gap': max_index - distinct,
+    }
+
+
 def check_lesson_count(plugin_root):
     """Verify global_lessons.md lesson count matches plugin.json claims."""
     # Find global_lessons.md at repo root
@@ -131,8 +152,8 @@ def check_lesson_count(plugin_root):
         return 'WARNING', f'global_lessons.md not found at {lessons_file}'
 
     content = lessons_file.read_text(encoding='utf-8', errors='replace')
-    # Count numbered lessons: lines starting with "N. **"
-    lesson_count = len(re.findall(r'^\d+\.\s+\*\*', content, re.MULTILINE))
+    # Count numbered lesson entries via the canonical rule — see sem/COUNTING.md
+    lesson_count = _compute_lesson_metrics(content)['entries']
 
     # Read plugin.json claim
     plugin_json = plugin_root / '.claude-plugin' / 'plugin.json'
@@ -147,6 +168,32 @@ def check_lesson_count(plugin_root):
         return 'PASS', f'{lesson_count} lessons in global_lessons.md, matches plugin.json'
 
     return 'WARNING', f'{lesson_count} lessons found but plugin.json missing'
+
+
+def check_lesson_metric_vector(plugin_root):
+    """Lesson Metric Vector Report (M0 / sem/COUNTING.md) — reports the five-value
+    vector; never a scalar. Flags duplicate identifiers (duplication_delta > 0) as a
+    WARNING; retirement_gap is informational (expected from folding/compression)."""
+    project_root = plugin_root.parent.parent
+    lessons_file = project_root / 'global_lessons.md'
+    if not lessons_file.exists():
+        return 'WARNING', f'global_lessons.md not found at {lessons_file}'
+
+    content = lessons_file.read_text(encoding='utf-8', errors='replace')
+    m = _compute_lesson_metrics(content)
+    categories = len(re.findall(r'^## ', content, re.MULTILINE))
+    detail = (
+        f"distinct={m['distinct']} entries={m['entries']} "
+        f"max_index+1={m['max_index_plus_one']} "
+        f"duplication_delta={m['duplication_delta']} "
+        f"retirement_gap={m['retirement_gap']} categories={categories}"
+    )
+    if m['duplication_delta'] > 0:
+        return 'WARNING', (
+            f"{detail} — {m['duplication_delta']} duplicate lesson id(s); "
+            "see sem/COUNTING.md + COUNTING_ANOMALIES_REPORT.md"
+        )
+    return 'PASS', detail
 
 
 def check_skill_directories(plugin_root):
@@ -209,6 +256,7 @@ def main():
         ('Agent Skill References', check_agent_skills),
         ('Orphaned Hook Files', check_orphaned_hooks),
         ('Lesson Count', check_lesson_count),
+        ('Lesson Metric Vector', check_lesson_metric_vector),
         ('Skill Directories', check_skill_directories),
         ('Plugin Metadata', check_plugin_json),
         ('Model Declarations', check_model_declarations),
