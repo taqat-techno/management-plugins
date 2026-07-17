@@ -174,3 +174,28 @@ Before delivering any portal or pipeline:
 - [ ] Print CSS shows all tabs with `display: block !important`
 - [ ] Embedded content properly escaped (`</script>` to `<\/script>`)
 - [ ] Chart.js updates use `.update()` API, not DOM manipulation
+
+
+---
+
+## v1.8.0 Lesson Absorptions
+
+### Lesson #763 — Phased single-file build patterns
+
+For multi-phase additive builds in a single growing HTML file (e.g., v13 PMO Dashboard's 5 IIFEs across Phases 1-8):
+
+- **One IIFE per phase.** Each starts with `'use strict';`. Self-contained closure prevents cross-phase variable pollution.
+- **Console.log signature per phase** (`console.log('[file vN Phase M] ready. Helpers: window.X, window.Y, ...')`) — DevTools console immediately shows which phase IIFEs initialized successfully (signatures present) vs which failed.
+- **Expose only public-API helpers via `window.X`.** Phase-specific local helpers stay inside the IIFE.
+- **Schema scales via optional fields + scope discriminator.** Add a `scope` field early; never remove old values. Filter logic: `if (e.scope === 'meeting')` — explicit equality check, never negate-check on missing values.
+- **Ship continuously when scope is additive-only.** Per-day pause-for-verification adds friction without safety; verify ONCE at end.
+
+### Lesson #764 — Persistent storage patterns for browser-served dashboards
+
+When localStorage's 5MB cap blocks scope:
+
+- **Month-sharded JSON files at `_data/{purpose}/YYYY-MM/{date}.{ext}`.** localStorage stays as fast read cache; file write is the durable record. Server endpoint creates monthDir on demand.
+- **`Storage.prototype.setItem` patch with key filter** (NEVER global). Patch ONCE per IIFE: preserve original via `var origSetItem = Storage.prototype.setItem`. Filter by specific key. Debounce side-effect 1500ms so rapid sequential writes coalesce. Make non-blocking — call original first, then setTimeout the side-effect.
+- **JSON wrapper schema:** include schema version + savedAt + entryCount + entries fields. Server creates monthDir on every write — idempotent.
+
+Reference: `D:\Global Lessons\global_lessons.md` lessons #763, #764.

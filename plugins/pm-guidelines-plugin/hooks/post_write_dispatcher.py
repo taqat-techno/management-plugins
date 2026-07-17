@@ -26,7 +26,7 @@ if PLUGIN_ROOT not in sys.path:
     sys.path.insert(0, os.path.join(PLUGIN_ROOT, 'hooks'))
 
 try:
-    from pm_utils import is_pm_deliverable, is_html_file, is_dashboard_file, read_file_safe
+    from pm_utils import is_pm_deliverable, is_html_file, is_dashboard_file, is_powershell_file, read_file_safe
 except ImportError as e:
     print(f"pm-guidelines:post_write_dispatcher: import failed: {e}", file=sys.stderr)
     sys.exit(0)
@@ -228,6 +228,115 @@ def check_html_render_reminder(file_path, content):
 
 
 # ---------------------------------------------------------------------------
+# Check: Nested-anchor in card (lesson #774a)
+# ---------------------------------------------------------------------------
+
+# Matches <a class="...card..."> ... <a ...> before the outer closes.
+# HTML5 parser auto-closes the outer when it hits the inner → grid layout collapses.
+_NESTED_ANCHOR_PATTERN = re.compile(
+    r'<a[^>]*class\s*=\s*["\'][^"\']*\bcard\b[^"\']*["\'][^>]*>[^<]*(?:<(?!/a\b)[^>]*>[^<]*)*<a\s',
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def check_nested_anchor_in_card(content):
+    """Find nested <a> inside <a class="card">. Lesson #774(a)."""
+    if not _NESTED_ANCHOR_PATTERN.search(content):
+        return []
+
+    # Find line numbers of the offending outer anchors
+    issues = []
+    for i, line in enumerate(content.split('\n'), 1):
+        if re.search(r'<a[^>]*class\s*=\s*["\'][^"\']*\bcard\b', line, re.IGNORECASE):
+            # Look ahead for nested <a> within next 30 lines (cards are usually compact)
+            lookahead = '\n'.join(content.split('\n')[i - 1:i + 30])
+            if _NESTED_ANCHOR_PATTERN.search(lookahead):
+                issues.append(
+                    f'  [Render #774a] Line {i}: nested <a> inside <a class="card"> '
+                    'auto-closes outer at parser level — grid collapses to 1-col with empty placeholder. '
+                    'Replace inner with <code> or move link OUTSIDE the card.'
+                )
+                if len(issues) >= 3:
+                    break
+    return issues
+
+
+# ---------------------------------------------------------------------------
+# Check: PowerShell 5.1 dialect (lesson #757a)
+# ---------------------------------------------------------------------------
+
+_PS7_PATTERNS = [
+    (re.compile(r'(?<![\w$])\?\?(?!\=)'), '`??` null-coalescing (PS 7+)'),
+    (re.compile(r'(?<![\w$])\?\s*[^:?\s][^:]*\s+:\s+'), '`?:` ternary (PS 7+)'),
+    (re.compile(r'\bJoin-Path\s+(?:[^\s,;]+\s+){2,}[^\s,;]+'), 'multi-arg Join-Path (PS 5.1 takes only 2)'),
+]
+
+
+def check_ps51_dialect(content):
+    """Find PS 7+ syntax in PS scripts. Lesson #757(a)."""
+    issues = []
+    for i, line in enumerate(content.split('\n'), 1):
+        # Skip comments
+        stripped = line.strip()
+        if stripped.startswith('#'):
+            continue
+        for pattern, desc in _PS7_PATTERNS:
+            if pattern.search(line):
+                issues.append(
+                    f'  [PS-Dialect #757a] Line {i}: {desc}. '
+                    'Windows default is PS 5.1; substitute with if/else or [System.IO.Path]::Combine.'
+                )
+                if len(issues) >= 5:
+                    return issues
+                break  # one finding per line
+    return issues
+
+
+# ---------------------------------------------------------------------------
+# Check: Bilingual numeric-mirror disparity (lesson #772a — companion to bilingual_parity)
+# ---------------------------------------------------------------------------
+
+def check_bilingual_numeric_mirror(content):
+    """Warn if EN spans contain digits the AR spans don't mirror.
+
+    Heuristic: count digits inside lang-en vs lang-ar spans. If they differ
+    significantly (>20%), the AR mirror likely fell behind an EN content edit.
+    Lesson #772(a) — AR-mirror drift is silent until language is toggled.
+    """
+    if not is_bilingual(content):
+        return []
+
+    en_blocks = re.findall(r'class=["\'][^"\']*lang-en[^"\']*["\'][^>]*>([^<]+)<', content)
+    ar_blocks = re.findall(r'class=["\'][^"\']*lang-ar[^"\']*["\'][^>]*>([^<]+)<', content)
+
+    if not en_blocks or not ar_blocks:
+        return []
+
+    en_digits = sum(len(re.findall(r'\d+', t)) for t in en_blocks)
+    ar_digits = sum(len(re.findall(r'\d+', t)) for t in ar_blocks)
+
+    # Both empty or both equal — no drift signal
+    if en_digits == 0 and ar_digits == 0:
+        return []
+
+    if en_digits == 0 or ar_digits == 0:
+        return [
+            f'  [Bilingual #772a] Numeric mirror disparity: {en_digits} digit-tokens in EN vs '
+            f'{ar_digits} in AR. Toggle EN↔AR in browser; verify counts/dates/numbers match.'
+        ]
+
+    # Allow up to 20% difference (Arabic numerals + Eastern-Arabic numerals)
+    ratio = max(en_digits, ar_digits) / max(min(en_digits, ar_digits), 1)
+    if ratio > 1.2:
+        return [
+            f'  [Bilingual #772a] Numeric mirror disparity: {en_digits} digit-tokens in EN vs '
+            f'{ar_digits} in AR (ratio {ratio:.2f}). AR mirror may be stale after EN edit. '
+            'Toggle EN↔AR in browser; sync the numbers.'
+        ]
+    return []
+
+
+# ---------------------------------------------------------------------------
 # Main Dispatcher
 # ---------------------------------------------------------------------------
 
@@ -249,9 +358,10 @@ def main():
         pm = is_pm_deliverable(file_path)
         html = is_html_file(file_path)
         dashboard = is_dashboard_file(file_path)
+        powershell = is_powershell_file(file_path)
 
-        # Gate: must be PM-relevant
-        if not (pm or html or dashboard):
+        # Gate: must be PM-relevant OR a PowerShell script
+        if not (pm or html or dashboard or powershell):
             sys.exit(0)
 
         # Read file content once
@@ -279,10 +389,11 @@ def main():
 
         # Bilingual checks (any HTML with bilingual markers)
         if html:
-            try:
-                issues.extend(check_bilingual_parity(content))
-            except Exception as e:
-                errors.append(f"check_bilingual_parity: {e}")
+            for check_fn in [check_bilingual_parity, check_bilingual_numeric_mirror, check_nested_anchor_in_card]:
+                try:
+                    issues.extend(check_fn(content))
+                except Exception as e:
+                    errors.append(f"{check_fn.__name__}: {e}")
 
         # Dashboard-specific checks
         if dashboard:
@@ -291,6 +402,13 @@ def main():
                     issues.extend(check_fn(content))
                 except Exception as e:
                     errors.append(f"{check_fn.__name__}: {e}")
+
+        # PowerShell-specific checks
+        if powershell:
+            try:
+                issues.extend(check_ps51_dialect(content))
+            except Exception as e:
+                errors.append(f"check_ps51_dialect: {e}")
 
         # Log any check failures to stderr
         for err in errors:

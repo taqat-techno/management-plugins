@@ -91,6 +91,37 @@ This is the master routing table. Every lesson category maps to specific plugin 
 | Modal, Audit & i18n | 117-120 | pm-dashboard-design | post_write_dispatcher | pm-report-reviewer |
 | OKR & KPI Dashboard v3 | 121-133 | pm-dashboard-design | post_write_dispatcher | pm-report-reviewer |
 | Email Analysis & Weekly Reporting | 134-137 | pm-report-writing | — | pm-report-reviewer |
+| Electron Renderer Pitfalls (Tier 1.2) | 746 | — | electron_renderer_check (PreToolUse) | — |
+| Native Electron Primitives | 747 | pm-html-infrastructure | — | — |
+| Embeddable Python Sidecars | 748 | pm-html-infrastructure | — | — |
+| Pure-Helpers in src/lib | 749 | pm-html-infrastructure | — | — |
+| UI Migration + Frozen Artifacts (Tier 1.1) | 750 | — | source_file_protection (.pm-frozen-paths) | — |
+| tRPC + React Query Migration | 751 | pm-html-infrastructure | — | — |
+| First-Launch Onboarding Patterns | 752 | pm-report-writing | — | — |
+| electron-updater Hardening | 753 | pm-html-infrastructure | — | — |
+| Cross-Runtime Deploy Hazards | 754 | pm-session-discipline | — | — |
+| Bilingual Hardcoded-String Scanner | 755 | pm-bilingual-standards | — | — |
+| MENA Workweek + Bilingual Doc | 756 | pm-bilingual-standards (absorbed v1.8.0) | — | — |
+| PowerShell + Task Scheduler | 757 | pm-session-discipline | post_write_dispatcher (check_ps51_dialect) | — |
+| Living-Doc Fork-vs-Edit | 758 | pm-session-discipline | — | — |
+| Verify External State + AskUserQuestion Scope | 759 | pm-session-discipline | — | — |
+| Pinned-Version Dependency Traps | 760 | pm-html-infrastructure | — | — |
+| Office COM Lifecycle | 761 | pm-devops-integration | — | — |
+| PowerShell + npm Preflight Building Blocks | 762 | pm-html-infrastructure | — | — |
+| Phased Single-File Build Patterns | 763 | pm-html-infrastructure (absorbed v1.8.0) | — | — |
+| Persistent Storage Patterns | 764 | pm-html-infrastructure (absorbed v1.8.0) | — | — |
+| Windows Scheduling + Build Primitives | 765 | pm-session-discipline | — | — |
+| Cadence + Roadmap Pull-Forwards | 766 | pm-session-discipline | — | — |
+| STP Demo Deck Clone-and-Edit | 767 | pm-multi-version-clone | — | — |
+| Phase-A Scaffold Pull-Forward + Multi-Repo | 768 | pm-session-discipline | — | — |
+| Cross-Dashboard Integration Drift (Tier 1.4) | 769 | pm-dashboard-design (absorbed v1.8.0) | — | pm-cross-dashboard-drift |
+| Coverage-Matrix Discipline (Tier 1.5) | 770 | pm-coverage-matrix | — | — |
+| Multi-Version HTML Clone Hygiene (Tier 1.3) | 771 | pm-multi-version-clone + pm-standalone-updater (absorbed v1.8.0) | — | — |
+| Bilingual + Audit-Check Drift Catchers | 772 | pm-bilingual-standards (absorbed v1.8.0) | post_write_dispatcher (check_bilingual_numeric_mirror) | pm-bilingual-qa |
+| Date-Bump + Subagent Re-Invocation | 773 | pm-session-discipline (absorbed v1.8.0) | — | — |
+| HTML Rendering Bugs (Cards/Anchors) | 774 | — | post_write_dispatcher (check_nested_anchor_in_card) | — |
+| Wording Precision in Stakeholder Docs | 775 | pm-report-writing (absorbed v1.8.0) | — | — |
+| Cross-Repo Push-Order + Stash Hygiene | 776 | pm-session-discipline (absorbed v1.8.0) | — | — |
 
 ## Sync Procedure
 
