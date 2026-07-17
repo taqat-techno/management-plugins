@@ -2,7 +2,7 @@
 
 > **Cross-project PM best practices enforcement — automated quality checks for status reports, dashboards, bilingual documents, and stakeholder deliverables.**
 
-**v1.7.0** | 504 guidelines | 8 hooks (7 quality checks in single dispatcher) | 14 skills | 6 agents
+**v1.8.0** | 736 guidelines | 8 hooks (7 quality checks in single dispatcher) | 14 skills | 2 slash commands | 7 agents
 
 **v1.5.0 added three skills-first authoring surfaces** — `pm-cross-tab-reconciler` (single-source-of-truth for multi-tab dashboards), `pm-link-integrity` (catalogue-before-move workflow for file reorganizations), and `pm-context-boundary` (internal-term scrub before external delivery). No new hooks; authoring-time guidance prevents mistakes the dispatcher would otherwise only flag after the Write lands.
 
@@ -10,17 +10,20 @@
 
 **v1.7.0 adds the final two optional Phase-3 surfaces** — `pm-data-readiness` skill (probe-before-publish workflow: every live-data claim gets a fresh probe, provenance record, and explicit confidence level; degrades honestly to LOW CONFIDENCE when probes fail) and `pm-link-auditor` agent (post-hoc hyperlink integrity audit; companion to the pm-link-integrity skill for files that were moved outside the skill's workflow). With this release the plugin covers all 12 failure gaps identified in the skills-first plan.
 
+**v1.8.0 adds the lesson-refinement workflow toolchain** — captures the manual May 7 refinement pass on `global_lessons.md` as reusable plugin components: `/pm-guidelines:PM-lessons-audit` slash command (deterministic structural audit using the same primitives baked into `lesson-gap-analyzer`), `pm-lessons-content-duplicates` agent (semantic dupe detector — same-topic lessons under different numbers, replaces general-purpose subagent invocation), and `/pm-guidelines:PM-lessons-refine` orchestrator (chains audit + decision sheet + renumber + merge + verify + PR — turns a 2-hour manual pass into ~30 min of orchestration). Also includes the `lesson-gap-analyzer` deterministic-primitives fix (the May 7 audit miss: reported 18 collisions when there were 23) and Rule 38-bis (reflog-aware mid-session verification) added to `pm-session-discipline`, both shipped earlier today via PR #1.
+
 ---
 
 ## What It Does
 
-Encodes 504 real-world PM lessons learned into a 3-layer enforcement system:
+Encodes 736 real-world PM lessons learned into a 4-layer enforcement system:
 
 | Layer | Purpose | How It Works |
 |-------|---------|-------------|
 | **Hooks** (8) | Real-time enforcement | Fire automatically on Write/Edit/Bash/Read/Stop events. 7 quality checks consolidated into single dispatcher for performance. |
 | **Skills** (14) | Knowledge injection + authoring-time guidance | Activate on prompt signals or file patterns during document generation |
-| **Agents** (6) | Batch quality review and specialist audits | Invoked after completing a deliverable (or delegated from pm-report-reviewer) for cross-file analysis |
+| **Slash commands** (2) | User-invoked workflows for `global_lessons.md` maintenance | `/pm-guidelines:PM-lessons-audit` and `/pm-guidelines:PM-lessons-refine` — explicit invocation, structured output |
+| **Agents** (7) | Batch quality review and specialist audits | Invoked after completing a deliverable (or delegated from pm-report-reviewer) for cross-file analysis |
 
 **Scoped to PM directories only** — hooks only fire on files in `researches/`, `reports/`, `deliverables/`, `dashboards/`, `proposals/`, `presentations/`, and `tasks/`. Zero noise for code files.
 
@@ -74,7 +77,18 @@ Encodes 504 real-world PM lessons learned into a 3-layer enforcement system:
 
 ---
 
-## Agents (6)
+## Slash Commands (2 — new in v1.8.0)
+
+| Command | Purpose |
+|---------|---------|
+| `/pm-guidelines:PM-lessons-audit` | Read-only structural audit of `global_lessons.md` — collisions, single-lesson categories, empty categories, out-of-order date blocks, max number, total counts. Uses deterministic shell primitives only (no eyeball enumeration). Output feeds Section A/C/D of the refinement decision sheet. |
+| `/pm-guidelines:PM-lessons-refine` | Orchestrates the 7-step refinement pass: pre-flight HEAD snapshot → structural audit (above) + semantic dupe agent → decision sheet → mechanical renumber → judgment merges → category absorptions → verify → PR. Dogfoods Rule 38-bis (reflog-aware mid-session verification) throughout. Supports `--dry-run`, `--section-a-only`, `--focus=N`, `--no-pr` flags. |
+
+Both commands are read-only by default; the orchestrator only edits files after the user marks the decision sheet with explicit ✅/❌/✏️ per row.
+
+---
+
+## Agents (7)
 
 | Agent | Model | Skills Preloaded | Purpose |
 |-------|-------|-----------------|---------|
@@ -83,7 +97,8 @@ Encodes 504 real-world PM lessons learned into a 3-layer enforcement system:
 | `pm-cross-tab-reconciler` | Opus | pm-dashboard-design, pm-cross-tab-reconciler skill | v1.6 — reads a multi-tab dashboard and reconciles numeric totals across tabs; returns Reconciliation Matrix + findings list |
 | `pm-md-html-parity-checker` | Opus | pm-report-writing, pm-html-infrastructure, pm-session-discipline | v1.6 — given a sibling MD+HTML pair, compares headings/tables/numbers/action-items; identifies likely-stale side via mtime |
 | `pm-link-auditor` | Opus | pm-link-integrity | **NEW v1.7** — post-hoc audit of hyperlink integrity across a folder or single file; identifies broken refs, orphan targets, nav-region breakage |
-| `lesson-gap-analyzer` | Opus | lesson-sync | Analyzes coverage of global_lessons.md across all plugin components |
+| `lesson-gap-analyzer` | Opus | lesson-sync | Analyzes coverage of global_lessons.md across all plugin components — uses deterministic primitives (post-PR #1 hardening) |
+| `pm-lessons-content-duplicates` | Opus | lesson-sync | **NEW v1.8** — semantic-duplicate detector for global_lessons.md bodies; finds same-topic lessons under different numbers via keyword overlap on title + first ~20 words. Companion to `lesson-gap-analyzer` (which is structural). |
 
 All agents are **read-only** (tools: Read, Grep, Glob). They never modify files. `pm-report-reviewer` auto-delegates to `pm-cross-tab-reconciler` for multi-tab dashboards, to `pm-md-html-parity-checker` for MD+HTML sibling pairs, and (optionally) to `pm-link-auditor` when nav regions are detected; findings are merged into the main review.
 
