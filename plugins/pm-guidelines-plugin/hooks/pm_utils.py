@@ -77,6 +77,14 @@ def is_html_file(file_path):
     return ext in {'.html', '.htm'}
 
 
+def is_powershell_file(file_path):
+    """Check if file is a PowerShell script."""
+    if not file_path:
+        return False
+    ext = os.path.splitext(file_path)[1].lower()
+    return ext in {'.ps1', '.psm1', '.psd1'}
+
+
 def is_dashboard_file(file_path):
     """Check if file appears to be a dashboard or report HTML."""
     if not is_html_file(file_path):

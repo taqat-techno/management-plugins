@@ -257,3 +257,21 @@ The `pm-md-html-parity-checker` agent (coming in Phase 2) diagnoses which option
 ### Why This Rule Exists
 
 HTML pages lose content on every regeneration from MD. If a KPI row, an assumption, a risk, or a table column was added directly to HTML, the next regenerate silently drops it. The user discovers the loss only when they re-open the file — often days later, often in front of a stakeholder.
+
+
+---
+
+## v1.8.0 Lesson Absorptions
+
+### Lesson #773 — Date-bump + subagent re-invocation discipline
+
+- **Distinguish event-dates from Modified-dates.** Event dates ("V15 moved 27 Apr", "ADRs approved 26 Mar", "commit pushed Apr 20") are immutable historical facts; Modified-dates are mutable metadata. NEVER use blanket bare-date regex (`sed -i 's/27 Apr 2026/28 Apr/g'`); use prefix-keyed sed: `sed -i 's/Modified: 27 Apr 2026/Modified: 28 Apr 2026/g'` or `s/Updated: ...`  or `s/تعديل: 27 أبريل 2026/تعديل: 28 أبريل 2026/g`.
+- **Session-end re-bump sweep.** Version-bump subagent runs once per drift-fix orchestrator pass; subsequent same-version content edits within the same V[N] don't trigger another invocation. At Workflow I/J, grep modified-today files for stale Modified-tags (`grep -lE "Modified: <yesterday>"`); re-bump targeted via prefix pattern.
+- Frozen historical files (Variance v12, USV3, HUB_PULL_HISTORY entries) MUST NOT bump — date stays at last actual edit.
+
+### Lesson #776 — Cross-repo push-order + git-stash hygiene
+
+- **Push-order rule:** when two repos have linked commits, source-of-truth/Hub repo pushes FIRST, dependent/standalone repo pushes second. Wrong order causes 404s if anyone pulls between the two pushes. Cross-check: grep dependent repo's pre-push tree for `https://github.com/<source-repo>/...` URLs — confirm targets exist on origin BEFORE pushing dependent.
+- **Stash hygiene:** `git stash push -u` sweeps in BOTH WIP and legitimate today-edits. Use `--keep-index`: `git add <today-relevant-files>` first, then `git stash push -u --keep-index -m "WIP <date> — <scope>"`. Stash message convention: include date + scope keywords for `git stash list | grep` discovery.
+
+Reference: `D:\Global Lessons\global_lessons.md` lessons #773, #776.

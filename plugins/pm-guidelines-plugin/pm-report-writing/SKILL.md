@@ -266,3 +266,18 @@ Before completing any PM document, verify:
 
 **Recurring Reports**
 - [ ] Update workflow embedded in the deliverable itself
+
+
+---
+
+## v1.8.0 Lesson Absorption
+
+### Lesson #775 — Wording precision in stakeholder docs
+
+Three rules for stakeholder-facing PM documentation:
+
+- **(a) "100% complete" is misleading wording when planning gates remain.** Conflates artifact-completeness with gate-closure. Use precise dual-statement language: "PM documentation set is complete and Board-ready" + "planning is not yet fully closed — N prerequisites remain (M planning-level + K execution-level)". Pre-publish: grep for "100% complete", "planning is done", "fully ready", "kickoff package complete" — soften any hit if gates remain.
+- **(b) Consolidated Blockers needs explicit 3-tier structure** rather than chronological mixed-callout list. Tier A — RESOLVED (brief recap). Tier B — ACTIVE Prerequisites (numbered, must clear before kickoff, classify each as planning/execution-level). Tier C — IN-FLIGHT / Cross-Referenced (parallel items + Hub V2-side risks, with cross-links). Close with verdict roll-up: "X Resolved · Y Active prereqs · Z In-flight. Sprint 0.1 cannot kick off until all Tier B items clear."
+- **(c) AskUserQuestion options must use plain-language operational descriptions, not technical abstractions.** Phrase each option in concrete file/folder operations ("stash locally", "copy to new folder X in repo Y", "commit to repo Z and push") not Git-internal references ("push to xhatem repo"). When user replies "I don't understand", that's the signal to re-ask with simpler ops-level framing.
+
+Reference: `D:\Global Lessons\global_lessons.md` lesson #775.

@@ -277,3 +277,23 @@ Before delivering any bilingual document:
 - [ ] Table columns render correctly in both directions
 - [ ] Font family includes Arabic-supporting font (Noto Kufi Arabic, Segoe UI)
 - [ ] Numbers use consistent format in both languages
+
+
+---
+
+## v1.8.0 Lesson Absorptions
+
+### Lesson #756 — MENA workweek + bilingual document patterns
+
+When working with bilingual EN/AR documents in MENA-context projects (Egypt, Saudi, UAE, Qatar, Kuwait):
+
+- **Workweek = Sunday-Thursday.** Friday + Saturday are weekends. SLA / dueDate math MUST use `addWorkdaysSunThu(start, n)` helper, never `addWorkdays(Mon-Fri)`. JS getDay(): 0=Sun, 5=Fri, 6=Sat → skip 5 and 6.
+- **Bilingual EN | AR section headers** in Word/MOM templates require an optional middle-group regex. Use shared `_PIPE_TAIL = r"(\s*\|\s*[^\n:：]+?)?"` between keyword alternation and trailing colon. Catches `Date:`, `Date | التاريخ:`, `التاريخ | Date:` uniformly.
+- **Calendar APIs** default to centered windows (back+forward) via `days_back: int = 0` query param — never forward-only, which hides Past Meetings governance surface.
+
+### Lesson #772 — Bilingual + audit-check drift catchers
+
+- **AR-mirror sync drift is silent until language is toggled.** After every EN content edit, scan ±5 lines for matching `lang-ar` mirror. Pre-publish: toggle EN ↔ AR in browser; visually compare counts/dates/words. (PostToolUse hook `check_bilingual_numeric_mirror` flags numeric disparity automatically.)
+- **Audit-check subagent needs V[N]-specific accommodations** when vocabulary shifts (e.g., "Active" → "Built · Planned R3 · Cancelled"). Pass a "Special accommodations for V[N]" block with EN+AR variants of new wording when invoking audit-check; otherwise expect false-positive WARN findings on correctly-written V[N] content.
+
+Reference: `D:\Global Lessons\global_lessons.md` lessons #756 and #772.
