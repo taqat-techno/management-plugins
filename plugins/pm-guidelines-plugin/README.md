@@ -2,7 +2,7 @@
 
 > **Cross-project PM best practices enforcement — automated quality checks for status reports, dashboards, bilingual documents, and stakeholder deliverables.**
 
-**v1.8.0** | 736 guidelines | 8 hooks (7 quality checks in single dispatcher) | 14 skills | 2 slash commands | 7 agents
+**v1.9.0** | 736 guidelines | 8 hooks (7 quality checks in single dispatcher) | 15 skills | 2 slash commands | 7 agents
 
 **v1.5.0 added three skills-first authoring surfaces** — `pm-cross-tab-reconciler` (single-source-of-truth for multi-tab dashboards), `pm-link-integrity` (catalogue-before-move workflow for file reorganizations), and `pm-context-boundary` (internal-term scrub before external delivery). No new hooks; authoring-time guidance prevents mistakes the dispatcher would otherwise only flag after the Write lands.
 
@@ -11,6 +11,8 @@
 **v1.7.0 adds the final two optional Phase-3 surfaces** — `pm-data-readiness` skill (probe-before-publish workflow: every live-data claim gets a fresh probe, provenance record, and explicit confidence level; degrades honestly to LOW CONFIDENCE when probes fail) and `pm-link-auditor` agent (post-hoc hyperlink integrity audit; companion to the pm-link-integrity skill for files that were moved outside the skill's workflow). With this release the plugin covers all 12 failure gaps identified in the skills-first plan.
 
 **v1.8.0 adds the lesson-refinement workflow toolchain** — captures the manual May 7 refinement pass on `global_lessons.md` as reusable plugin components: `/pm-guidelines:PM-lessons-audit` slash command (deterministic structural audit using the same primitives baked into `lesson-gap-analyzer`), `pm-lessons-content-duplicates` agent (semantic dupe detector — same-topic lessons under different numbers, replaces general-purpose subagent invocation), and `/pm-guidelines:PM-lessons-refine` orchestrator (chains audit + decision sheet + renumber + merge + verify + PR — turns a 2-hour manual pass into ~30 min of orchestration). Also includes the `lesson-gap-analyzer` deterministic-primitives fix (the May 7 audit miss: reported 18 collisions when there were 23) and Rule 38-bis (reflog-aware mid-session verification) added to `pm-session-discipline`, both shipped earlier today via PR #1.
+
+**v1.9.0 adds the `sprint-insights` skill** — the Sprint Governance & Reporting workflow for an Azure DevOps project: derive + **CONFIRM** the project-named deliverables folder, set it up (or reconcile a mis-named/mis-located one), then produce the bilingual EN/AR sprint-governance deliverable set (sprint report, governance validation, gap-closure verification, executive board brief, success-criteria scorecard, operational action plan) from a **LIVE read-only** ADO pull. Pairs with the `/sprint-insights` slash command and the `feedback-sprint-insights-request-workflow` memory rule.
 
 ---
 
@@ -21,7 +23,7 @@ Encodes 736 real-world PM lessons learned into a 4-layer enforcement system:
 | Layer | Purpose | How It Works |
 |-------|---------|-------------|
 | **Hooks** (8) | Real-time enforcement | Fire automatically on Write/Edit/Bash/Read/Stop events. 7 quality checks consolidated into single dispatcher for performance. |
-| **Skills** (14) | Knowledge injection + authoring-time guidance | Activate on prompt signals or file patterns during document generation |
+| **Skills** (15) | Knowledge injection + authoring-time guidance | Activate on prompt signals or file patterns during document generation |
 | **Slash commands** (2) | User-invoked workflows for `global_lessons.md` maintenance | `/pm-guidelines:PM-lessons-audit` and `/pm-guidelines:PM-lessons-refine` — explicit invocation, structured output |
 | **Agents** (7) | Batch quality review and specialist audits | Invoked after completing a deliverable (or delegated from pm-report-reviewer) for cross-file analysis |
 
@@ -56,7 +58,7 @@ Encodes 736 real-world PM lessons learned into a 4-layer enforcement system:
 
 ---
 
-## Skills (14)
+## Skills (15)
 
 | Skill | Model | Purpose |
 |-------|-------|---------|
@@ -74,6 +76,7 @@ Encodes 736 real-world PM lessons learned into a 4-layer enforcement system:
 | `pm-consolidation` | Opus | Multi-source merge: conflict tracking, gap classification, source attribution |
 | `pm-standalone-updater` | Sonnet | Version folder management, Document Control, BA review loops, auto-updater, deep body-text audit |
 | `lesson-sync` | Sonnet | Lesson-to-component routing, sync procedure, gap analysis |
+| `sprint-insights` | Sonnet | **NEW v1.9** — Sprint Governance & Reporting for an ADO project: name-gate → folder setup/reconciliation → live read-only bilingual deliverable set (sprint report, governance validation, gap-closure, exec brief, scorecards, action plan) |
 
 ---
 
@@ -190,6 +193,8 @@ pm-guidelines-plugin/
 ├── pm-standalone-updater/
 │   └── SKILL.md
 ├── lesson-sync/
+│   └── SKILL.md
+├── sprint-insights/               ← NEW v1.9
 │   └── SKILL.md
 └── tests/
     ├── conftest.py
